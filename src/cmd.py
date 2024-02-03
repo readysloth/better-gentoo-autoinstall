@@ -47,9 +47,10 @@ class Cmd:
             **kwargs
         )
 
+        self.hooks = hooks
         self.before = lambda: None
         self.after = lambda: None
-        if hooks:
+        if self.hooks:
             self.before, self.after = hooks
 
     def __call__(self, *args, **kwargs) -> sp.CompletedProcess:
@@ -116,12 +117,14 @@ class Package(ShellCmd):
 
         hooks = []
         if prefetch:
-            hooks = [Package(package,
-                             '--fetchonly --deep',
+            hooks = [Package(self.package,
+                             emerge_override='--fetchonly --deep',
                              blocking=True,
                              prefetch=False,
                              env={'USE': self.use_flags}),
                      lambda *args, **kwargs: None]
+
+        self.delayed_emerge = ShellCmd(f'echo "{self.package}" >> /var/lib/portage/world')
 
         super().__init__(
             self.cmd,
@@ -140,6 +143,13 @@ class Package(ShellCmd):
 
         if self.blocking:
             return super().__call__(*args, **kwargs)
+
+    def __repr__(self):
+        if self.hooks:
+            return f'{repr(self.before)}\n{repr(self.delayed_emerge)}'
+        if self.emerge_override:
+            return super().__repr__()
+        return repr(self.delayed_emerge)
 
 
 class IfKeyword:
