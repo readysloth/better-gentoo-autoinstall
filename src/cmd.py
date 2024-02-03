@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 def env_dict_to_str(env):
-    return ' '.join([f'{k}={v}' for k, v in env])
+    return ' '.join([f'{k}="{v}"' for k, v in env.items()])
 
 
 class Cmd:
@@ -49,7 +49,7 @@ class Cmd:
 
         self.before = lambda: None
         self.after = lambda: None
-        if self.hooks:
+        if hooks:
             self.before, self.after = hooks
 
     def __call__(self, *args, **kwargs) -> sp.CompletedProcess:
@@ -63,7 +63,7 @@ class Cmd:
         return proc
 
     def __repr__(self) -> str:
-        return f'{env_dict_to_str(self.env)} {self.cmd.join(" ")}'
+        return f'{env_dict_to_str(self.env)} {" ".join(self.cmd)}'
 
     def __str__(self) -> str:
         return f'{self.name}: {self.desc}'
@@ -112,17 +112,20 @@ class Package(ShellCmd):
         self.fs_friendly_name = self.package.replace('/', '.')
         self.cmd = f'emerge {self.emerge_override} {self.package}'
 
+        hooks = []
         if prefetch:
-            self.hooks = [Package(package,
-                                  '--fetchonly --deep',
-                                  blocking=True,
-                                  env={'USE': use_flags}),
-                          lambda *args, **kwargs: None]
+            hooks = [Package(package,
+                             '--fetchonly --deep',
+                             blocking=True,
+                             prefetch=False,
+                             env={'USE': self.use_flags}),
+                     lambda *args, **kwargs: None]
 
         super().__init__(
             self.cmd,
             name=package,
             critical=False,
+            hooks=hooks,
             *args,
             **kwargs
         )

@@ -221,7 +221,7 @@ PACKAGES = [
     Package('net-im/telegram-desktop',
             binary_alternative='net-im/telegram-desktop-bin'),
     ShellCmd('git clone --depth=1 https://github.com/rvaiya/warpd.git'
-             ' && cd warpd; DISABLE_WAYLAND=1 make && make install; cd -',
+             ' && cd warpd; DISABLE_WAYLAND=1 make && make install; cd -'
              ' && rm -rf warpd',
              name='warpd installation'),
 
