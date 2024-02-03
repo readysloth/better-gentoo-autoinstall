@@ -156,3 +156,13 @@ class IfNotKeyword(IfKeyword):
             self.if_true(*args, **kwargs)
         elif self.if_false:
             self.if_false(*args, **kwargs)
+
+
+class OptionalCommands:
+
+    def __init__(self, clause: IfKeyword, keyword: str, commands: List[Cmd]):
+        self.exec_list = [clause(keyword, cmd, None) for cmd in commands]
+
+    def __call__(self, *args, **kwargs):
+        for e in self.exec_list:
+            e(*args, **kwargs)
