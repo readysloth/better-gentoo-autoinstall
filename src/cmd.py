@@ -66,7 +66,9 @@ class Cmd:
         return f'{env_dict_to_str(self.env)} {" ".join(self.cmd)}'
 
     def __str__(self) -> str:
-        return f'{self.name}: {self.desc}'
+        if self.desc:
+            return f'{self.name}: {self.desc}'
+        return self.name
 
 
 class ShellCmd(Cmd):
@@ -124,6 +126,7 @@ class Package(ShellCmd):
         super().__init__(
             self.cmd,
             name=package,
+            desc=self.use_flags,
             critical=False,
             hooks=hooks,
             *args,
@@ -135,30 +138,45 @@ class Package(ShellCmd):
             with open(self.package_use_dir / self.fs_friendly_name, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
-        super().__call__(*args, **kwargs)
+        if self.blocking:
+            return super().__call__(*args, **kwargs)
 
 
 class IfKeyword:
 
     def __init__(self, keyword: str, if_true: Cmd, if_false: Optional[Cmd]):
         self.keyword = keyword
-        self.if_true = if_true
-        self.if_false = if_false
+        if os.getenv(self.keyword) is not None:
+            self.exec = if_true
+        else:
+            self.exec = if_false
 
     def __call__(self, *args, **kwargs):
-        if os.getenv(self.keyword):
-            self.if_true(*args, **kwargs)
-        elif self.if_false:
-            self.if_false(*args, **kwargs)
+        if self.exec:
+            return self.exec(*args, **kwargs)
+
+    def __repr__(self) -> str:
+        return repr(self.exec)
+
+    def __str__(self) -> str:
+        if self.exec:
+            return f'{self.exec} (choosen by "{self.keyword}")'
+        return f'(excluded by absence of "{self.keyword}")'
 
 
 class IfNotKeyword(IfKeyword):
 
-    def __call__(self, *args, **kwargs):
-        if not os.getenv(self.keyword):
-            self.if_true(*args, **kwargs)
-        elif self.if_false:
-            self.if_false(*args, **kwargs)
+    def __init__(self, keyword: str, if_true: Cmd, if_false: Optional[Cmd]):
+        self.keyword = keyword
+        if os.getenv(self.keyword) is None:
+            self.exec = if_true
+        else:
+            self.exec = if_false
+
+    def __str__(self) -> str:
+        if self.exec:
+            return f'{self.exec} (choosen by absence of "{self.keyword}")'
+        return f'(excluded because of "{self.keyword}")'
 
 
 class OptionalCommands:
@@ -167,5 +185,10 @@ class OptionalCommands:
         self.exec_list = [clause(keyword, cmd, None) for cmd in commands]
 
     def __call__(self, *args, **kwargs):
-        for e in self.exec_list:
-            e(*args, **kwargs)
+        return [e(*args, **kwargs) for e in self.exec_list]
+
+    def __repr__(self) -> str:
+        return '\n'.join([repr(e) for e in self.exec_list])
+
+    def __str__(self) -> str:
+        return '\n'.join([str(e) for e in self.exec_list])
