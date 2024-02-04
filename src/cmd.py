@@ -53,8 +53,14 @@ class Cmd:
         if self.hooks:
             self.before, self.after = hooks
 
-    def __call__(self, *args, **kwargs) -> sp.CompletedProcess:
+    def __call__(self,
+                 *args,
+                 pretend: bool = False,
+                 **kwargs) -> sp.CompletedProcess:
         self.env: dict = kwargs.get('env', self.env)
+
+        if pretend:
+            return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
         proc: sp.CompletedProcess = self.process(*args, **kwargs)
@@ -64,6 +70,8 @@ class Cmd:
         return proc
 
     def __repr__(self) -> str:
+        if not self.env:
+            return " ".join(self.cmd)
         return f'{env_dict_to_str(self.env)} {" ".join(self.cmd)}'
 
     def __str__(self) -> str:
@@ -113,6 +121,7 @@ class Package(ShellCmd):
             self.binary = True
 
         self.fs_friendly_name = self.package.replace('/', '.')
+        self.useflags_file = self.package_use_dir / self.fs_friendly_name
         self.cmd = f'emerge {self.emerge_override} {self.package}'
 
         hooks = []
@@ -124,7 +133,7 @@ class Package(ShellCmd):
                              env={'USE': self.use_flags}),
                      lambda *args, **kwargs: None]
 
-        self.delayed_emerge = ShellCmd(f'echo "{self.package}" >> /var/lib/portage/world')
+            self.cmd = f'echo "{self.package}" >> /var/lib/portage/world'
 
         super().__init__(
             self.cmd,
@@ -136,20 +145,25 @@ class Package(ShellCmd):
             **kwargs
         )
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, pretend: bool = False, **kwargs):
+        if pretend:
+            return [super().__call__(*args, pretend=pretend, **kwargs)]
+
         if not self.binary:
-            with open(self.package_use_dir / self.fs_friendly_name, 'a') as use:
+            with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
         if self.blocking:
             return super().__call__(*args, **kwargs)
 
     def __repr__(self):
+        commands = []
+        if not self.emerge_override:
+            commands.append(f'echo "{self.use_flags}" >> {self.useflags_file.absolute()}')
+        commands.append(super().__repr__())
         if self.hooks:
-            return f'{repr(self.before)}\n{repr(self.delayed_emerge)}'
-        if self.emerge_override:
-            return super().__repr__()
-        return repr(self.delayed_emerge)
+            commands = [f'{repr(self.before)}'] + commands
+        return '\n'.join(commands)
 
 
 class IfKeyword:
