@@ -48,8 +48,8 @@ class Cmd:
         )
 
         self.hooks = hooks
-        self.before = lambda: None
-        self.after = lambda: None
+        self.before = lambda *args, **kwargs: None
+        self.after = lambda *args, **kwargs: None
         if self.hooks:
             self.before, self.after = hooks
 
@@ -147,7 +147,9 @@ class Package(ShellCmd):
 
     def __call__(self, *args, pretend: bool = False, **kwargs):
         if pretend:
-            return [super().__call__(*args, pretend=pretend, **kwargs)]
+            return [self.before(pretend=True),
+                    super().__call__(*args, pretend=pretend, **kwargs),
+                    self.after(pretend=True)]
 
         if not self.binary:
             with open(self.useflags_file, 'a') as use:
@@ -159,7 +161,7 @@ class Package(ShellCmd):
     def __repr__(self):
         commands = []
         if not self.emerge_override:
-            commands.append(f'echo "{self.use_flags}" >> {self.useflags_file.absolute()}')
+            commands.append(f'echo "{self.package} {self.use_flags}" >> {self.useflags_file.absolute()}')
         commands.append(super().__repr__())
         if self.hooks:
             commands = [f'{repr(self.before)}'] + commands
