@@ -1,5 +1,4 @@
 import os
-import shlex
 import functools as ft
 import subprocess as sp
 
@@ -17,6 +16,32 @@ def env_dict_to_str(env):
     return ' '.join([f'{k}="{v}"' for k, v in env.items()])
 
 
+class PythonCall:
+
+    def __init__(self,
+                 callback,
+                 *args,
+                 equivalent: str = '',
+                 blocking: bool = True,
+                 critical: bool = True,
+                 **kwargs):
+        self.callback = ft.partial(callback, *args, **kwargs)
+        self.equivalent = equivalent
+
+    def __call__(self, *args, pretend: bool = False, **kwargs):
+        if pretend:
+            return sp.CompletedProcess(self.equivalent, returncode=0)
+        return self.callback(*args, **kwargs)
+
+    def __repr__(self):
+        return self.equivalent
+
+    def __str__(self):
+        if self.desc:
+            return f'{self.name}: {self.desc}'
+        return self.name
+
+
 class Cmd:
 
     def __init__(self,
@@ -29,6 +54,7 @@ class Cmd:
                  desc: str = '',
                  blocking: bool = True,
                  critical: bool = True,
+                 ignore_change: bool = False,
                  keywords: Optional[Set[str]] = None,
                  env: Optional[Dict[str, str]] = None,
                  *args,
@@ -40,9 +66,9 @@ class Cmd:
         self.critical = critical
         self.env = env or {}
         self.keywords = keywords or set()
+        self.ignore_change = ignore_change
         self.process = ft.partial(
             sp.Popen,
-            args=self.cmd,
             *args,
             **kwargs
         )
@@ -52,6 +78,17 @@ class Cmd:
         self.after = lambda *args, **kwargs: None
         if self.hooks:
             self.before, self.after = hooks
+
+    def append(self, *args):
+        if self.ignore_change:
+            return
+        self.cmd += args
+
+    def insert(self, index, *args):
+        if self.ignore_change:
+            return
+        for i in enumerate(args):
+            self.cmd.insert(index + i, args[i])
 
     def __call__(self,
                  *args,
@@ -63,7 +100,7 @@ class Cmd:
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
-        proc: sp.CompletedProcess = self.process(*args, **kwargs)
+        proc: sp.CompletedProcess = self.process(*args, args=self.cmd, **kwargs)
         if self.blocking:
             proc.wait()
         self.after(self, proc)
@@ -83,7 +120,17 @@ class Cmd:
 class ShellCmd(Cmd):
 
     def __init__(self, cmd: str, *args, **kwargs):
-        super().__init__(shlex.split(cmd), *args, shell=True, **kwargs)
+        super().__init__([cmd], *args, shell=True, **kwargs)
+
+    def append(self, *args):
+        if self.ignore_change:
+            return
+        self.cmd = [' '.join(self.cmd + list(args))]
+
+    def insert(self, cmd_part: str):
+        if self.ignore_change:
+            return
+        self.cmd = [self.cmd[0].replace('%placeholder%', cmd_part)]
 
 
 class Package(ShellCmd):
@@ -145,7 +192,8 @@ class Package(ShellCmd):
             **kwargs
         )
 
-    def __call__(self, *args, pretend: bool = False, **kwargs):
+    def __call__(self, *args, pretend: bool = False, **kwargs) -> Union[List[sp.CompletedProcess],
+                                                                        sp.CompletedProcess]:
         if pretend:
             return [self.before(pretend=True),
                     super().__call__(*args, pretend=pretend, **kwargs),
@@ -177,7 +225,7 @@ class IfKeyword:
         else:
             self.exec = if_false
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Optional[sp.CompletedProcess]:
         if self.exec:
             return self.exec(*args, **kwargs)
 
@@ -210,7 +258,7 @@ class OptionalCommands:
     def __init__(self, clause: IfKeyword, keyword: str, commands: List[Cmd]):
         self.exec_list = [clause(keyword, cmd, None) for cmd in commands]
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> List[sp.CompletedProcess]:
         return [e(*args, **kwargs) for e in self.exec_list]
 
     def __repr__(self) -> str:
