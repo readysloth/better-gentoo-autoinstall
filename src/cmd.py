@@ -1,4 +1,5 @@
 import os
+import logging
 import functools as ft
 import subprocess as sp
 
@@ -61,7 +62,7 @@ class Cmd:
                  **kwargs):
         self.cmd = cmd
         self.desc = desc
-        self.name = name or self.cmd
+        self.name = name or ' '.join(self.cmd)
         self.blocking = blocking
         self.critical = critical
         self.env = env or {}
@@ -94,6 +95,8 @@ class Cmd:
                  *args,
                  pretend: bool = False,
                  **kwargs) -> sp.CompletedProcess:
+        logger = logging.getLogger()
+        logger.info(str(self))
         self.env: dict = kwargs.get('env', self.env)
 
         if pretend:
@@ -102,6 +105,7 @@ class Cmd:
         self.before(self)
         proc: sp.CompletedProcess = self.process(*args, args=self.cmd, **kwargs)
         if self.blocking:
+            logger.info(f'Waiting for "{self}"')
             proc.wait()
         self.after(self, proc)
         return proc
@@ -137,7 +141,7 @@ class Package(ShellCmd):
 
     package_use_dir = Path('/etc/portage/package.use')
     package_env_dir = Path('/etc/portage/package.env')
-    package_mask_dir = Path('/etc/portage/package.use')
+    package_mask_dir = Path('/etc/portage/package.mask')
     package_accept_kwd = Path('/etc/portage/package.accept_keywords')
 
     def __init__(self,
@@ -192,8 +196,11 @@ class Package(ShellCmd):
             **kwargs
         )
 
-    def __call__(self, *args, pretend: bool = False, **kwargs) -> Union[List[sp.CompletedProcess],
-                                                                        sp.CompletedProcess]:
+    def __call__(self,
+                 *args,
+                 pretend: bool = False,
+                 **kwargs) -> Union[List[sp.CompletedProcess],
+                                    sp.CompletedProcess]:
         if pretend:
             return [self.before(pretend=True),
                     super().__call__(*args, pretend=pretend, **kwargs),
