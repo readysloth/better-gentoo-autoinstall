@@ -35,7 +35,10 @@ STAGE3 = [
              'mount --rbind       /dev  /mnt/gentoo/dev',
              'mount --make-rslave       /mnt/gentoo/dev']),
              name='mount',
-             desc='mounting virtual filesystems')
+             desc='mounting virtual filesystems'),
+    ShellCmd('cp *.sh *.py /mnt/gentoo',
+             name='script copy',
+             desc='installation scripts copy to chroot folder')
 ]
 
 
