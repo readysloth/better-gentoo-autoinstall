@@ -63,6 +63,10 @@ class Cmd:
         self.cmd = cmd
         self.desc = desc
         self.name = name or ' '.join(self.cmd)
+        self.fs_friendly_name = self.name.replace('/', '.') \
+                                         .replace('_', '.') \
+                                         .replace('>', '') \
+                                         .replace('<', '')
         self.blocking = blocking
         self.critical = critical
         self.env = env or {}
@@ -103,7 +107,14 @@ class Cmd:
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
-        proc: sp.CompletedProcess = self.process(*args, args=self.cmd, **kwargs)
+        stdout_file = open(f'{self.fs_friendly_name}.stdout', 'rb')
+        stderr_file = open(f'{self.fs_friendly_name}.stderr', 'rb')
+        proc: sp.CompletedProcess = self.process(
+            *args,
+            args=self.cmd,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            **kwargs)
         if self.blocking:
             logger.info(f'Waiting for "{self}"')
             proc.wait()
@@ -172,7 +183,12 @@ class Package(ShellCmd):
             self.package = binary_alternative
             self.binary = True
 
-        self.fs_friendly_name = self.package.replace('/', '.')
+        # Copy-pasted here, because Cmd class initialization
+        # should happen later
+        self.fs_friendly_name = self.package.replace('/', '.') \
+                                            .replace('_', '.') \
+                                            .replace('>', '') \
+                                            .replace('<', '')
         self.useflags_file = self.package_use_dir / self.fs_friendly_name
         self.cmd = f'emerge {self.emerge_override} {self.package}'
 
@@ -236,7 +252,7 @@ class IfKeyword:
 
     def __init__(self, keyword: str, if_true: Cmd, if_false: Optional[Cmd]):
         self.keyword = keyword
-        if os.getenv(self.keyword) is not None:
+        if bool(self):
             self.exec = if_true
         else:
             self.exec = if_false
@@ -244,6 +260,9 @@ class IfKeyword:
     def __call__(self, *args, **kwargs) -> Optional[sp.CompletedProcess]:
         if self.exec:
             return self.exec(*args, **kwargs)
+
+    def __bool__(self):
+        return os.getenv(self.keyword) is not None
 
     def __repr__(self) -> str:
         return repr(self.exec)
@@ -258,10 +277,13 @@ class IfNotKeyword(IfKeyword):
 
     def __init__(self, keyword: str, if_true: Cmd, if_false: Optional[Cmd]):
         self.keyword = keyword
-        if os.getenv(self.keyword) is None:
+        if bool(self):
             self.exec = if_true
         else:
             self.exec = if_false
+
+    def __bool__(self):
+        return os.getenv(self.keyword) is None
 
     def __str__(self) -> str:
         if self.exec:
@@ -278,7 +300,7 @@ class OptionalCommands:
         return [e(*args, **kwargs) for e in self.exec_list]
 
     def __repr__(self) -> str:
-        return '\n'.join([repr(e) for e in self.exec_list])
+        return '\n'.join([repr(e) for e in self.exec_list if e])
 
     def __str__(self) -> str:
-        return '\n'.join([str(e) for e in self.exec_list])
+        return '\n'.join([str(e) for e in self.exec_list if e])
