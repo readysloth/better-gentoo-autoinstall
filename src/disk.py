@@ -53,9 +53,11 @@ DISK_FS_CREATION_OPS = [
              name='mkfs.fat',
              desc='efi-boot creation'),
     ShellCmd(f'mkfs.ext4 /dev/{LVM_GROUP}/rootfs',
+             ignore_change=True,
              name='mkfs.ext4',
              desc='rootfs creation'),
     ShellCmd(f'e2label /dev/{LVM_GROUP}/rootfs rootfs',
+             ignore_change=True,
              name='e2label',
              desc='rootfs labeling'),
 ]
