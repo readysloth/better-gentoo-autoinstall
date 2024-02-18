@@ -107,13 +107,13 @@ class Cmd:
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
-        stdout_file = open(f'{self.fs_friendly_name}.stdout', 'rb')
-        stderr_file = open(f'{self.fs_friendly_name}.stderr', 'rb')
+        if 'stdout' not in kwargs:
+            kwargs['stdout'] = open(f'{self.fs_friendly_name}.stdout', 'wb')
+        if 'stderr' not in kwargs:
+            kwargs['stderr'] = open(f'{self.fs_friendly_name}.stderr', 'wb')
         proc: sp.CompletedProcess = self.process(
             *args,
             args=self.cmd,
-            stdout=stdout_file,
-            stderr=stderr_file,
             **kwargs)
         if self.blocking:
             logger.info(f'Waiting for "{self}"')
