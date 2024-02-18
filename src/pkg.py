@@ -19,15 +19,38 @@ GLOBAL_USE_FLAGS = [
 ]
 
 
+PORTAGE_SETUP = [
+    ShellCmd('emerge-webrsync'),
+    Package('sys-apps/portage',
+            emerge_override='--oneshot',
+            blocking=True),
+    Package('app-portage/gentoolkit',
+            blocking=True),
+    ShellCmd('eselect profile set --force 6'),
+    Package('app-portage/cpuid2cpuflags',
+            blocking=True),
+    ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
+    ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
+    ShellCmd('mkdir -p /etc/portage/env'),
+    ShellCmd('mkdir -p /etc/portage/profile'),
+    Package('app-portage/mirrorselect',
+            blocking=True),
+    ShellCmd('mirrorselect -s15 -4 -D',
+             name='mirrorselect',
+             desc='searh for best mirrors'),
+    ShellCmd('perl-cleaner --reallyall'),
+    Package('net-misc/aria2',
+            extra_use_flags='bittorent libuv ssh',
+            blocking=True),
+]
+
+
 PACKAGES = [
     # earliest to emerge packages
     # other packages indirectly depend
     # on those
     Package('media-libs/libsndfile',
             use_flags='minimal',
-            blocking=True),
-    Package('net-misc/aria2',
-            extra_use_flags='bittorent libuv ssh',
             blocking=True),
     Package('dev-util/vmtouch',
             blocking=True),
@@ -258,5 +281,10 @@ PACKAGES = [
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
          Package('app-admin/conky',
-                 use_flags='intel-backlight iostats portmon imlib rss')])
+                 use_flags='intel-backlight iostats portmon imlib rss')]),
+
+    Package('@world',
+            blocking=True,
+            prefetch=False,
+            emerge_override='-uDNv --with-bdeps=y --backtrack=100')
 ]
