@@ -139,6 +139,7 @@ class ShellCmd(Cmd):
 
 class Package(ShellCmd):
 
+    prefetch_procs = []
     package_use_dir = Path('/etc/portage/package.use')
     package_env_dir = Path('/etc/portage/package.env')
     package_mask_dir = Path('/etc/portage/package.mask')
@@ -179,17 +180,23 @@ class Package(ShellCmd):
         if prefetch:
             hooks = [Package(self.package,
                              emerge_override='--fetchonly --deep',
-                             blocking=True,
+                             desc='package prefetch started',
+                             blocking=False,
                              prefetch=False,
                              env={'USE': self.use_flags}),
                      lambda *args, **kwargs: None]
 
             self.cmd = f'echo "{self.package}" >> /var/lib/portage/world'
 
+        description = self.use_flags
+        if 'desc' in kwargs:
+            description = kwargs['desc']
+            kwargs.pop('desc')
+
         super().__init__(
             self.cmd,
             name=package,
-            desc=self.use_flags,
+            desc=description,
             critical=False,
             hooks=hooks,
             *args,
@@ -210,8 +217,10 @@ class Package(ShellCmd):
             with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
-        if self.blocking:
-            return super().__call__(*args, **kwargs)
+        proc = super().__call__(*args, **kwargs)
+        if '--fetchonly' in self.emerge_override:
+            self.prefetch_procs.append(proc)
+        return proc
 
     def __repr__(self):
         commands = []
