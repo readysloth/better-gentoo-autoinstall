@@ -1,15 +1,21 @@
 import os
 import json
 import logging
+import itertools as it
 import subprocess as sp
 
+import pkg
 import disk
 import stage3
-import pkg
+
+from operator import itemgetter
+from typing import List, Optional
+from conf_files import (add_variable_to_file,
+                        add_value_to_variable)
 
 from cursed_handler import CursesHandler
 
-from cmd import ShellCmd
+from cmd import ShellCmd, Package
 
 CHROOT_SCRIPT_PRETEND = [
     ShellCmd('cat > chroot_script.sh << EOF\n%placeholder%\nEOF',
@@ -18,6 +24,17 @@ CHROOT_SCRIPT_PRETEND = [
              name='chroot script copy'),
     ShellCmd('chroot /bin/bash /chroot_script.sh',
              name='chroot install')
+]
+
+MOUNT_BOOT = ShellCmd('mount %placeholder% /mnt/gentoo/boot',
+                      name='boot mount')
+
+USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
+
+USER_CMDS = [
+    ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
+             name='user creation'),
+    ShellCmd('mkdir /home/user/.config')
 ]
 
 
@@ -41,24 +58,105 @@ def disk_stage(disk_node: str, pretend: bool = False):
     executed_cmds.append(disk.create_lvm(lvm_part, pretend=pretend))
     executed_cmds.append(disk.mkfs(boot_part, pretend=pretend))
     executed_cmds.append(disk.mount(pretend=pretend))
-    return executed_cmds
+    return (it.chain.from_iterable(map(itemgetter(0), executed_cmds)),
+            it.chain.from_iterable(map(itemgetter(1), executed_cmds)))
 
 
 def install(disk_node: str, pretend: bool = False):
     executed_cmds = []
-    executed_cmds += disk_stage(disk_node, pretend=pretend)
-    executed_cmds += stage3.stage3(pretend=pretend)
+    executed_cmds.append(disk_stage(disk_node, pretend=pretend))
+    executed_cmds.append(stage3.stage3(pretend=pretend))
+
+    boot_part = get_part(disk_node, 1, pretend=pretend)
+    MOUNT_BOOT.insert(boot_part)
+
+    executed_cmds.append([[MOUNT_BOOT(pretend=pretend)], [MOUNT_BOOT]])
 
     if not pretend:
         os.chroot('/mnt/gentoo')
         os.chdir('/')
 
-    cmds_in_chroot = []
+    chroot_prepare = []
     for cmd in CHROOT_SCRIPT_PRETEND:
-        cmds_in_chroot.append(cmd(pretend=True))
+        chroot_prepare.append(cmd(pretend=True))
+    executed_cmds.append([chroot_prepare, CHROOT_SCRIPT_PRETEND])
 
-    executed_cmds += (cmds_in_chroot, CHROOT_SCRIPT_PRETEND)
-    return executed_cmds
+    make_conf_path = '/etc/portage/make.conf'
+    conf_pretend = []
+    if not pretend:
+        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', '-march=native')
+        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch')
+        add_variable_to_file(make_conf_path, 'ACCEPT_LICENSE', '*')
+        add_variable_to_file(make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS))
+        add_variable_to_file(make_conf_path, 'PORTAGE_IONICE_COMMAND', r'ionice -c 3 -p \${PID}')
+        add_variable_to_file(make_conf_path, 'ACCEPT_KEYWORDS', '~amd64 amd64 x86')
+        add_variable_to_file(make_conf_path, 'INPUT_DEVICES', 'synaptics libinput')
+        add_variable_to_file(make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc')
+
+    conf_pretend.append(
+        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', '-march=native', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'ACCEPT_LICENSE', '*', pretend=True))
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS), pretend=True))
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'PORTAGE_IONICE_COMMAND', r'ionice -c 3 -p \${PID}', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'ACCEPT_KEYWORDS', '~amd64 amd64 x86', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'INPUT_DEVICES', 'synaptics libinput', pretend=True)
+    )
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc', pretend=True)
+    )
+
+    chroot_cmds = []
+    for cmd in conf_pretend:
+        chroot_cmds.append(cmd(pretend=True))
+
+    for cmd in pkg.PORTAGE_SETUP:
+        chroot_cmds.append(cmd(pretend=pretend))
+
+    aria_cmd = [r"/usr/bin/aria2c",
+                r"--dir=\${DISTDIR}",
+                r"--out=\${FILE}",
+                r"--allow-overwrite=true",
+                r"--max-tries=5",
+                r"--max-file-not-found=2",
+                r"--user-agent=Wget/1.19.1",
+                r"--connect-timeout=5",
+                r"--timeout=5",
+                r"--split=15",
+                r"--min-split-size=2M",
+                r"--max-connection-per-server=2",
+                r"--uri-selector=inorder \${URI}"]
+
+    if not pretend:
+        add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd))
+    conf_pretend.append(
+        add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd), pretend=True)
+    )
+
+    for cmd in USER_CMDS:
+        chroot_cmds.append(cmd(pretend=pretend))
+
+    for cmd in pkg.PACKAGES:
+        chroot_cmds.append(cmd(pretend=pretend))
+
+    executed_cmds.append([chroot_cmds,
+                          conf_pretend + pkg.PORTAGE_SETUP + pkg.PACKAGES])
+
+    return (it.chain.from_iterable(map(itemgetter(0), executed_cmds)),
+            it.chain.from_iterable(map(itemgetter(1), executed_cmds)))
 
 
 def setup_logging():
@@ -66,3 +164,25 @@ def setup_logging():
     curses_handler = CursesHandler()
     logger.setLevel(logging.INFO)
     logger.addHandler(curses_handler)
+
+
+def pretend_script(disk_node: str):
+    for cmd in install(disk_node, pretend=True)[1]:
+        yield repr(cmd)
+
+
+def pretend_install(disk_node: str):
+    def chain_proc_list(proc_list):
+        for proc in proc_list:
+            if not proc:
+                continue
+            if type(proc) == list:
+                yield from chain_proc_list(proc)
+            else:
+                yield proc
+
+    for proc in install(disk_node, pretend=True)[0]:
+        if type(proc) == list:
+            yield from chain_proc_list(proc)
+        else:
+            yield proc
