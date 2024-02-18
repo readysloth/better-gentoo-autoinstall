@@ -1,7 +1,7 @@
+import os
 import sys
+import logging
 import argparse
-
-import install
 
 
 def parse_args(args):
@@ -19,17 +19,34 @@ def parse_args(args):
     install_parser.add_argument('-d', '--dump',
                                 action='store_true',
                                 help='dump install as bash script')
-
+    install_parser.add_argument('-m', '--minimal',
+                                action='store_true',
+                                help='make installation as minimal, as possible')
     return parser.parse_args()
 
 
 def main(args):
+    if args.minimal:
+        os.environ['minimal'] = 'True'
+    if args.prefer_binary:
+        os.environ['binary'] = 'True'
+
+    import install
+
     if args.pretend:
         for proc in install.pretend_install(args.disk):
             print(proc)
+        return
     if args.dump:
         for line in install.pretend_script(args.disk):
             print(line)
+        return
+    install.setup_logging()
+    install.install(args.disk)
+    logger = logging.getLogger()
+    logger.warning('Do not forget to do `passwd user` to set user password')
+    logger.info('Setup is complete, press Enter to exit')
+    input()
 
 
 if __name__ == '__main__':
