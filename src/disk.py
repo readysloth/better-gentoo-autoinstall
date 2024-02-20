@@ -8,9 +8,11 @@ LVM_GROUP = f'vg0{random.randint(1, 10)}'
 
 DISK_PREPARE = [
     ShellCmd('wipefs -af %placeholder%',
+             critical=True,
              name='wipefs',
              desc='removal of existing FS'),
     ShellCmd('rc-service lvm start',
+             critical=True,
              ignore_change=True,
              name='lvm service',
              desc='start of lvm service'),
@@ -18,11 +20,13 @@ DISK_PREPARE = [
              '$(vgs --noheadings --separator % | cut -d % -f 1); do '
              'vgremove -y "$g"; '
              'done',
+             critical=True,
              ignore_change=True,
              name='vgremove',
              desc='removal of existing LVM groups'),
 ] + [
     ShellCmd(f'parted -a optimal --script %placeholder% "{script}"',
+             critical=True,
              name='parted',
              desc='disk partitioning')
     for script in ['mklabel gpt',
@@ -37,12 +41,15 @@ DISK_PREPARE = [
 
 DISK_LVM_FIN = [
     ShellCmd('pvcreate -ff',
+             critical=True,
              name='pvcreate',
              desc='physical volume init'),
     ShellCmd(f'vgcreate {LVM_GROUP}',
+             critical=True,
              name='vgcreate',
              desc='volume group creation'),
     ShellCmd(f'lvcreate -y -l 100%FREE -n rootfs {LVM_GROUP}',
+             critical=True,
              ignore_change=True,
              name='vgcreate',
              desc='logical volume creation'),
@@ -50,13 +57,16 @@ DISK_LVM_FIN = [
 
 DISK_FS_CREATION_OPS = [
     ShellCmd('mkfs.fat -F 32 -n efi-boot',
+             critical=True,
              name='mkfs.fat',
              desc='efi-boot creation'),
     ShellCmd(f'mkfs.ext4 /dev/{LVM_GROUP}/rootfs',
+             critical=True,
              ignore_change=True,
              name='mkfs.ext4',
              desc='rootfs creation'),
     ShellCmd(f'e2label /dev/{LVM_GROUP}/rootfs rootfs',
+             critical=True,
              ignore_change=True,
              name='e2label',
              desc='rootfs labeling'),
@@ -64,6 +74,7 @@ DISK_FS_CREATION_OPS = [
 
 DISK_MOUNT_OPS = [
     ShellCmd(f'mount /dev/{LVM_GROUP}/rootfs /mnt/gentoo',
+             critical=True,
              name='mount',
              desc='rootfs mount'),
 ]
