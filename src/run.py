@@ -42,11 +42,14 @@ def main(args):
             print(line)
         return
     install.setup_logging()
-    install.install(args.disk)
     logger = logging.getLogger()
+    try:
+        install.install(args.disk)
+    except Exception:
+        logger.exception('Unhandled install error occured')
+        return
     logger.warning('Do not forget to do `passwd user` to set user password')
-    logger.info('Setup is complete, press Enter to exit')
-    input()
+    logger.info('Setup is complete')
 
 
 if __name__ == '__main__':
