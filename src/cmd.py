@@ -116,8 +116,14 @@ class Cmd:
             args=self.cmd,
             **kwargs)
         if self.blocking:
-            logger.info(f'Waiting for "{self}"')
+            logger.info(f'Waiting for "{self}" (pid: {proc.pid})')
             proc.wait()
+        if self.critical:
+            if not self.blocking:
+                logger.info(f'Waiting for "{self}" (pid: {proc.pid})')
+            proc.wait()
+            if proc.returncode != 0:
+                raise RuntimeError(f'Critical process returned non-zero code ({proc.returncode}): {repr(self)}')
         self.after(self, proc)
         return proc
 
@@ -163,7 +169,6 @@ class Package(ShellCmd):
                  use_flags: Union[List[str], str] = '',
                  extra_use_flags: Union[List[str], str] = '',
                  prefetch: bool = True,
-                 *args,
                  **kwargs):
         self.emerge_override = emerge_override
 
@@ -208,14 +213,14 @@ class Package(ShellCmd):
         if 'desc' in kwargs:
             description = kwargs['desc']
             kwargs.pop('desc')
+        if 'critical' not in kwargs:
+            kwargs['critical'] = False
 
         super().__init__(
             self.cmd,
             name=package,
             desc=description,
-            critical=False,
             hooks=hooks,
-            *args,
             **kwargs
         )
 
@@ -225,9 +230,9 @@ class Package(ShellCmd):
                  **kwargs) -> Union[List[sp.CompletedProcess],
                                     sp.CompletedProcess]:
         if pretend:
-            return [self.before(pretend=True),
+            return [self.before(pretend=pretend),
                     super().__call__(*args, pretend=pretend, **kwargs),
-                    self.after(pretend=True)]
+                    self.after(pretend=pretend)]
 
         if not self.binary:
             with open(self.useflags_file, 'a') as use:
