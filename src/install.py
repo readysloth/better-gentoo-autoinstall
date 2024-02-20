@@ -162,7 +162,9 @@ def install(disk_node: str, pretend: bool = False):
 def setup_logging():
     logger = logging.getLogger()
     curses_handler = CursesHandler()
+    file_handler = logging.FileHandler('install.log')
     logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
     logger.addHandler(curses_handler)
 
 
