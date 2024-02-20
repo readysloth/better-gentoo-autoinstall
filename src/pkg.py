@@ -20,28 +20,29 @@ GLOBAL_USE_FLAGS = [
 
 
 PORTAGE_SETUP = [
-    ShellCmd('emerge-webrsync'),
+    ShellCmd('emerge-webrsync',
+             critical=True),
     Package('sys-apps/portage',
             emerge_override='--oneshot',
-            blocking=True),
+            critical=True),
     Package('app-portage/gentoolkit',
-            blocking=True),
+            critical=True),
     ShellCmd('eselect profile set --force 6'),
     Package('app-portage/cpuid2cpuflags',
-            blocking=True),
+            critical=True),
     ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
     ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
     ShellCmd('mkdir -p /etc/portage/env'),
     ShellCmd('mkdir -p /etc/portage/profile'),
     Package('app-portage/mirrorselect',
-            blocking=True),
+            critical=True),
     ShellCmd('mirrorselect -s15 -4 -D',
              name='mirrorselect',
-             desc='searh for best mirrors'),
+             desc='search for best mirrors'),
     ShellCmd('perl-cleaner --reallyall'),
     Package('net-misc/aria2',
             extra_use_flags='bittorent libuv ssh',
-            blocking=True),
+            critical=True),
 ]
 
 
