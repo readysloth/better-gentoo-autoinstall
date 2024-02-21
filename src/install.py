@@ -31,13 +31,13 @@ MOUNT_BOOT = ShellCmd('mount %placeholder% /mnt/gentoo/boot',
 
 USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
 
-USER_CMDS = [
+POST_INSTALL = [
     ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
              name='user creation'),
-    ShellCmd('mkdir /home/user/.config')
-]
+    ShellCmd('mkdir /home/user/.config'),
+    ShellCmd('bash create_configs.sh user',
+             name='user finalization'),
 
-POST_INSTALL = [
     ShellCmd('''grub-install --target=$(lscpu | awk '/Architecture/ {print $2}')-efi --efi-directory=/boot --removable''',
              name='grub install'),
     ShellCmd(' && '.join([r'git clone --depth=1 https://github.com/AdisonCavani/distro-grub-themes.git',
@@ -172,9 +172,6 @@ def install(disk_node: str, pretend: bool = False):
     conf_pretend.append(
         add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd), pretend=True)
     )
-
-    for cmd in USER_CMDS:
-        chroot_cmds.append(cmd(pretend=pretend))
 
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
