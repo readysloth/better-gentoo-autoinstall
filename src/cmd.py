@@ -80,7 +80,10 @@ class Cmd:
         self.before = lambda *args, **kwargs: None
         self.after = lambda *args, **kwargs: None
         if self.hooks:
-            self.before, self.after = hooks
+            if len(self.hooks) == 1:
+                self.before = hooks[0]
+            else:
+                self.before, self.after = hooks
 
     def append(self, *args):
         if self.ignore_change:
@@ -204,15 +207,14 @@ class Package(ShellCmd):
         if 'blocking' not in kwargs:
             kwargs['blocking'] = False
 
-        hooks = []
         if prefetch and not (kwargs['critical'] or kwargs['blocking']):
-            hooks = [Package(self.package,
-                             emerge_override='--fetchonly --deep',
-                             desc='package prefetch started',
-                             blocking=False,
-                             prefetch=False,
-                             env={'USE': self.use_flags}),
-                     lambda *args, **kwargs: None]
+            kwargs['hooks'] = [Package(self.package,
+                                       emerge_override='--fetchonly --deep',
+                                       desc='package prefetch started',
+                                       blocking=False,
+                                       prefetch=False,
+                                       env={'USE': self.use_flags}),
+                               lambda *args, **kwargs: None]
 
             self.cmd = f'echo "{self.package}" >> /var/lib/portage/world'
 
@@ -220,7 +222,6 @@ class Package(ShellCmd):
             self.cmd,
             name=package + ('-prefetch' if prefetch else ''),
             desc=description,
-            hooks=hooks,
             **kwargs
         )
 
