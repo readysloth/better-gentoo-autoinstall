@@ -58,7 +58,6 @@ class Cmd:
                  ignore_change: bool = False,
                  keywords: Optional[Set[str]] = None,
                  env: Optional[Dict[str, str]] = None,
-                 *args,
                  **kwargs):
         self.cmd = cmd
         self.desc = desc
@@ -74,7 +73,6 @@ class Cmd:
         self.ignore_change = ignore_change
         self.process = ft.partial(
             sp.Popen,
-            *args,
             **kwargs
         )
 
@@ -96,7 +94,6 @@ class Cmd:
             self.cmd.insert(index + i, args[i])
 
     def __call__(self,
-                 *args,
                  pretend: bool = False,
                  **kwargs) -> sp.CompletedProcess:
         logger = logging.getLogger()
@@ -111,8 +108,9 @@ class Cmd:
             kwargs['stdout'] = open(f'{self.fs_friendly_name}.stdout', 'wb')
         if 'stderr' not in kwargs:
             kwargs['stderr'] = open(f'{self.fs_friendly_name}.stderr', 'wb')
+
+        logger.debug(f'Launching {self.cmd} **{kwargs}')
         proc: sp.CompletedProcess = self.process(
-            *args,
             args=self.cmd,
             **kwargs)
         if self.blocking:
@@ -197,8 +195,15 @@ class Package(ShellCmd):
         self.useflags_file = self.package_use_dir / self.fs_friendly_name
         self.cmd = f'emerge {self.emerge_override} {self.package}'
 
+        description = self.use_flags
+        if 'desc' in kwargs:
+            description = kwargs['desc']
+            kwargs.pop('desc')
+        if 'critical' not in kwargs:
+            kwargs['critical'] = False
+
         hooks = []
-        if prefetch:
+        if prefetch and not kwargs['critical']:
             hooks = [Package(self.package,
                              emerge_override='--fetchonly --deep',
                              desc='package prefetch started',
@@ -209,36 +214,28 @@ class Package(ShellCmd):
 
             self.cmd = f'echo "{self.package}" >> /var/lib/portage/world'
 
-        description = self.use_flags
-        if 'desc' in kwargs:
-            description = kwargs['desc']
-            kwargs.pop('desc')
-        if 'critical' not in kwargs:
-            kwargs['critical'] = False
-
         super().__init__(
             self.cmd,
-            name=package,
+            name=package + ('-prefetch' if prefetch else ''),
             desc=description,
             hooks=hooks,
             **kwargs
         )
 
     def __call__(self,
-                 *args,
                  pretend: bool = False,
                  **kwargs) -> Union[List[sp.CompletedProcess],
                                     sp.CompletedProcess]:
         if pretend:
             return [self.before(pretend=pretend),
-                    super().__call__(*args, pretend=pretend, **kwargs),
+                    super().__call__(pretend=pretend, **kwargs),
                     self.after(pretend=pretend)]
 
         if not self.binary:
             with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
-        proc = super().__call__(*args, **kwargs)
+        proc = super().__call__(**kwargs)
         if '--fetchonly' in self.emerge_override:
             self.prefetch_procs.append(proc)
         return proc
