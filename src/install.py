@@ -8,14 +8,14 @@ import pkg
 import disk
 import stage3
 
+from typing import List
 from operator import itemgetter
-from typing import List, Optional
 from conf_files import (add_variable_to_file,
                         add_value_to_variable)
 
 from cursed_handler import CursesHandler
 
-from cmd import ShellCmd, Package
+from cmd import ShellCmd
 
 CHROOT_SCRIPT_PRETEND = [
     ShellCmd('cat > chroot_script.sh << EOF\n%placeholder%\nEOF',
@@ -35,6 +35,33 @@ USER_CMDS = [
     ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
              name='user creation'),
     ShellCmd('mkdir /home/user/.config')
+]
+
+POST_INSTALL = [
+    ShellCmd('''grub-install --target=$(lscpu | awk '/Architecture/ {print $2}')-efi --efi-directory=/boot --removable''',
+             name='grub install'),
+    ShellCmd(' && '.join([r'git clone --depth=1 https://github.com/AdisonCavani/distro-grub-themes.git',
+                          r'mkdir -p /boot/grub/themes/gentoo',
+                          r'tar -xvf distro-grub-themes/themes/gentoo.tar -C /boot/grub/themes/gentoo',
+                          r'echo "GRUB_GFXMODE=1920x1080" >> /etc/default/grub',
+                          r'echo "GRUB_THEME=\"/boot/grub/themes/gentoo/theme.txt\"" >> /etc/default/grub',
+                          r'rm -rf distro-grub-themes']),
+             name='grub theme'),
+    ShellCmd('echo "GRUB_CMDLINE_LINUX=\"dolvm\"" >> /etc/default/grub',
+             name='grub config'),
+    ShellCmd('grub-mkconfig -o /boot/grub/grub.cfg',
+             name='grub config'),
+    ShellCmd('chmod +x /etc/local.d/*.start',
+             name='local.d services'),
+    ShellCmd('rc-update add lvmetad boot',
+             name='lvmetad'),
+] + [
+    ShellCmd(f'rc-update add {s} default',
+             name=f'service {s}',
+             desc='added to default runlevel')
+    for s in ['sysklogd', 'cronie', 'alsasound',
+              'docker', 'libvirtd', 'pulseaudio',
+              'dbus', 'NetworkManager']
 ]
 
 
@@ -155,8 +182,17 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.BLOCKING_PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
+    for cmd in POST_INSTALL:
+        chroot_cmds.append(cmd(pretend=pretend))
+
     chroot_cmds.append(pkg.WORLD(pretend=pretend))
-    commands_decl = conf_pretend + pkg.PORTAGE_SETUP + pkg.BLOCKING_PACKAGES + pkg.PACKAGES + [pkg.WORLD]
+    commands_decl = []
+    commands_decl += conf_pretend
+    commands_decl += pkg.PORTAGE_SETUP
+    commands_decl += pkg.BLOCKING_PACKAGES
+    commands_decl += pkg.PACKAGES
+    commands_decl += [pkg.WORLD]
+    commands_decl += POST_INSTALL
     executed_cmds.append([chroot_cmds, commands_decl])
 
     return (it.chain.from_iterable(map(itemgetter(0), executed_cmds)),
