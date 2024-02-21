@@ -152,8 +152,12 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
-    executed_cmds.append([chroot_cmds,
-                          conf_pretend + pkg.PORTAGE_SETUP + pkg.PACKAGES])
+    for cmd in pkg.BLOCKING_PACKAGES:
+        chroot_cmds.append(cmd(pretend=pretend))
+
+    chroot_cmds.append(pkg.WORLD(pretend=pretend))
+    commands_decl = conf_pretend + pkg.PORTAGE_SETUP + pkg.BLOCKING_PACKAGES + pkg.PACKAGES + [pkg.WORLD]
+    executed_cmds.append([chroot_cmds, commands_decl])
 
     return (it.chain.from_iterable(map(itemgetter(0), executed_cmds)),
             it.chain.from_iterable(map(itemgetter(1), executed_cmds)))
@@ -163,7 +167,7 @@ def setup_logging():
     logger = logging.getLogger()
     curses_handler = CursesHandler()
     file_handler = logging.FileHandler('install.log')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(os.getenv('LOGLEVEL', 'INFO').upper())
     logger.addHandler(file_handler)
     logger.addHandler(curses_handler)
 

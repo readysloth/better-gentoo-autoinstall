@@ -45,8 +45,12 @@ PORTAGE_SETUP = [
             critical=True),
 ]
 
+WORLD = Package('@world',
+                critical=True,
+                prefetch=False,
+                emerge_override='-uDNv --with-bdeps=y --backtrack=100')
 
-PACKAGES = [
+BLOCKING_PACKAGES = [
     # earliest to emerge packages
     # other packages indirectly depend
     # on those
@@ -55,9 +59,6 @@ PACKAGES = [
             blocking=True),
     Package('dev-util/vmtouch',
             blocking=True),
-
-    Package('dev-util/ccache',
-            keywords={'dev'}),
 
     # essential packages
     Package('sys-devel/gcc',
@@ -83,6 +84,12 @@ PACKAGES = [
     Package('sys-apps/portage',
             extra_use_flags='native-extensions ipc',
             blocking=True),
+]
+
+
+PACKAGES = [
+    Package('dev-util/ccache',
+            keywords={'dev'}),
 
     # simple packages
     Package('app-admin/doas'),
@@ -283,9 +290,4 @@ PACKAGES = [
                  use_flags='libssh lvm parted qemu libvirtd'),
          Package('app-admin/conky',
                  use_flags='intel-backlight iostats portmon imlib rss')]),
-
-    Package('@world',
-            blocking=True,
-            prefetch=False,
-            emerge_override='-uDNv --with-bdeps=y --backtrack=100')
 ]
