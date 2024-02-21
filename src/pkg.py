@@ -1,8 +1,25 @@
+import os
+
+import urllib.request as ur
+
 from cmd import (Package,
                  ShellCmd,
                  IfKeyword,
                  IfNotKeyword,
                  OptionalCommands)
+
+
+def st_patches(*args, pretend: bool = False, **kwargs):
+    if pretend:
+        return
+    patch_folder_path = '/etc/portage/patches/x11-terms/st'
+    base_url = 'https://st.suckless.org/patches/'
+    patches = ['alpha/st-alpha-20220206-0.8.5.diff',
+               'dynamic-cursor-color/st-dynamic-cursor-color-0.8.4.diff']
+    os.makedirs(patch_folder_path, exist_ok=True)
+    for p in patches:
+        patchname = p.split('/')[1]
+        ur.urlretrieve(f'{base_url}/{p}', f'{patch_folder_path}/{patchname}')
 
 
 GLOBAL_USE_FLAGS = [
@@ -177,7 +194,6 @@ PACKAGES = [
     Package('x11-misc/clipmenu', use_flags='rofi -dmenu'),
     Package('x11-misc/picom', use_flags='config-file drm'),
     Package('x11-misc/polybar', use_flags='mpd network ipc'),
-    Package('x11-terms/st', use_flags='savedconfig'),
 
     # packages with keywords
     Package('app-forensics/radamsa', keywords={'dev'}),
@@ -255,6 +271,10 @@ PACKAGES = [
              ' && cd warpd; DISABLE_WAYLAND=1 make && make install; cd -'
              ' && rm -rf warpd',
              name='warpd installation'),
+
+    Package('x11-terms/st',
+            use_flags='savedconfig',
+            hooks=[st_patches]),
 
 
     # optional packages
