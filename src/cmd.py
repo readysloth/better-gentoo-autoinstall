@@ -201,9 +201,11 @@ class Package(ShellCmd):
             kwargs.pop('desc')
         if 'critical' not in kwargs:
             kwargs['critical'] = False
+        if 'blocking' not in kwargs:
+            kwargs['blocking'] = False
 
         hooks = []
-        if prefetch and not kwargs['critical']:
+        if prefetch and not (kwargs['critical'] or kwargs['blocking']):
             hooks = [Package(self.package,
                              emerge_override='--fetchonly --deep',
                              desc='package prefetch started',
