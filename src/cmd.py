@@ -68,10 +68,11 @@ class Cmd:
         self.cmd = cmd
         self.desc = desc
         self.name = name or ' '.join(self.cmd)
-        self.fs_friendly_name = self.name.replace('/', '.') \
-                                         .replace('_', '.') \
-                                         .replace('>', '') \
-                                         .replace('<', '')
+        if not hasattr(self, 'fs_friendly_name'):
+            self.fs_friendly_name = self.name.replace('/', '.') \
+                                             .replace('_', '.') \
+                                             .replace('>', '') \
+                                             .replace('<', '')
         self.blocking = blocking
         self.critical = critical
         self.env = env or {}
