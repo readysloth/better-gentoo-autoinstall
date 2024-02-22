@@ -178,7 +178,19 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.BLOCKING_PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
-    chroot_cmds.append(pkg.WORLD(pretend=pretend))
+    max_retries = 5
+    world_install = []
+    for i in range(max_retries + 1):
+        try:
+            world_install.append(pkg.WORLD)
+            chroot_cmds.append(pkg.WORLD(pretend=pretend))
+        except RuntimeError:
+            if i == max_retries:
+                raise
+            world_install.append(pkg.ETC_UPDATE)
+            chroot_cmds.append(pkg.ETC_UPDATE(pretend=pretend))
+        else:
+            break
 
     for cmd in POST_INSTALL:
         chroot_cmds.append(cmd(pretend=pretend))
@@ -188,7 +200,7 @@ def install(disk_node: str, pretend: bool = False):
     commands_decl += pkg.PORTAGE_SETUP
     commands_decl += pkg.BLOCKING_PACKAGES
     commands_decl += pkg.PACKAGES
-    commands_decl += [pkg.WORLD]
+    commands_decl += world_install
     commands_decl += POST_INSTALL
     executed_cmds.append([chroot_cmds, commands_decl])
 

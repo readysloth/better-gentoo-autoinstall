@@ -62,10 +62,17 @@ PORTAGE_SETUP = [
             critical=True),
 ]
 
+
 WORLD = Package('@world',
                 critical=True,
                 prefetch=False,
-                emerge_override='-uDNv --with-bdeps=y --backtrack=100')
+                emerge_override=' '.join(['-uDNv',
+                                          '--with-bdeps=y',
+                                          '--backtrack=100',
+                                          '--autounmask-write']))
+
+ETC_UPDATE = ShellCmd('echo -5 | etc-update')
+
 
 BLOCKING_PACKAGES = [
     # earliest to emerge packages
