@@ -69,7 +69,8 @@ WORLD = Package('@world',
                 emerge_override=' '.join(['-uDNv',
                                           '--with-bdeps=y',
                                           '--backtrack=100',
-                                          '--autounmask-write']))
+                                          '--autounmask-write',
+                                          '--keep-going']))
 
 ETC_UPDATE = ShellCmd('echo -5 | etc-update')
 
