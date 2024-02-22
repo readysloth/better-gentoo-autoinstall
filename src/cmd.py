@@ -209,6 +209,9 @@ class Package(ShellCmd):
         if 'blocking' not in kwargs:
             kwargs['blocking'] = False
 
+        if self.package.startswith('@'):
+            prefetch = False
+
         if prefetch and not (kwargs['critical'] or kwargs['blocking']):
             kwargs['hooks'] = [Package(self.package,
                                        emerge_override='--fetchonly --deep',
