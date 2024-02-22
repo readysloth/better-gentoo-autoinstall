@@ -74,5 +74,6 @@ class CursesHandler(logging.StreamHandler):
         self.log.clear()
         for i, record in enumerate(self.records):
             msg = self.format(record)
+            msg = msg[:curses.COLS - 3]
             self.log.addstr(1+i, 2, msg, self.colormap[record.levelno])
         self.log.refresh()
