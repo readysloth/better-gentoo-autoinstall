@@ -100,10 +100,11 @@ class Cmd:
                  pretend: bool = False,
                  **kwargs) -> sp.CompletedProcess:
         logger = logging.getLogger()
-        logger.info(str(self))
+        process_started_msg = str(self)
         self.env: dict = kwargs.get('env', self.env)
 
         if pretend:
+            logger.info(process_started_msg)
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
@@ -116,12 +117,13 @@ class Cmd:
         proc: sp.CompletedProcess = self.process(
             args=self.cmd,
             **kwargs)
+        logger.info(f'{process_started_msg} pid: {proc.pid}')
         if self.blocking:
-            logger.info(f'Waiting for "{self}" (pid: {proc.pid})')
+            logger.debug(f'Waiting for "{self}" pid: {proc.pid}')
             proc.wait()
         if self.critical:
             if not self.blocking:
-                logger.info(f'Waiting for "{self}" (pid: {proc.pid})')
+                logger.debug(f'Waiting for "{self}" pid: {proc.pid}')
             proc.wait()
             if proc.returncode != 0:
                 raise RuntimeError(f'Critical process returned non-zero code ({proc.returncode}): {repr(self)}')
@@ -220,7 +222,7 @@ class Package(ShellCmd):
 
         super().__init__(
             self.cmd,
-            name=package + ('-prefetch' if prefetch else ''),
+            name=package + ('-prefetch' if '--fetchonly' in self.emerge_override else ''),
             desc=description,
             **kwargs
         )
