@@ -59,6 +59,8 @@ class Cmd:
                  keywords: Optional[Set[str]] = None,
                  env: Optional[Dict[str, str]] = None,
                  **kwargs):
+        self.counter = 0
+
         self.cmd = cmd
         self.desc = desc
         self.name = name or ' '.join(self.cmd)
@@ -101,6 +103,7 @@ class Cmd:
                  **kwargs) -> sp.CompletedProcess:
         logger = logging.getLogger()
         process_started_msg = str(self)
+        self.counter += 1
         self.env: dict = kwargs.get('env', self.env)
 
         if pretend:
@@ -109,21 +112,21 @@ class Cmd:
 
         self.before(self)
         if 'stdout' not in kwargs:
-            kwargs['stdout'] = open(f'{self.fs_friendly_name}.stdout', 'wb')
+            kwargs['stdout'] = open(f'{self.fs_friendly_name}-{self.counter}.stdout', 'wb')
         if 'stderr' not in kwargs:
-            kwargs['stderr'] = open(f'{self.fs_friendly_name}.stderr', 'wb')
+            kwargs['stderr'] = open(f'{self.fs_friendly_name}-{self.counter}.stderr', 'wb')
 
         logger.debug(f'Launching {self.cmd} **{kwargs}')
         proc: sp.CompletedProcess = self.process(
             args=self.cmd,
             **kwargs)
-        logger.info(f'{process_started_msg} pid: {proc.pid}')
+        logger.info(f'{process_started_msg} (pid: {proc.pid})')
         if self.blocking:
-            logger.debug(f'Waiting for "{self}" pid: {proc.pid}')
+            logger.debug(f'Waiting for "{self}" (pid: {proc.pid})')
             proc.wait()
         if self.critical:
             if not self.blocking:
-                logger.debug(f'Waiting for "{self}" pid: {proc.pid}')
+                logger.debug(f'Waiting for "{self}" (pid: {proc.pid})')
             proc.wait()
             if proc.returncode != 0:
                 raise RuntimeError(f'Critical process returned non-zero code ({proc.returncode}): {repr(self)}')
