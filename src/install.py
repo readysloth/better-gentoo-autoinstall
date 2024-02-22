@@ -198,8 +198,13 @@ def install(disk_node: str, pretend: bool = False):
 
 def setup_logging():
     logger = logging.getLogger()
+    formatter = logging.Formatter(fmt='%(asctime)s %(message)s', datefmt='%H:%M')
+
     curses_handler = CursesHandler()
     file_handler = logging.FileHandler('install.log')
+
+    curses_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
     logger.setLevel(os.getenv('LOGLEVEL', 'INFO').upper())
     logger.addHandler(file_handler)
     logger.addHandler(curses_handler)
