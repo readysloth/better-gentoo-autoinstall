@@ -61,8 +61,8 @@ class Cmd:
                  keywords: Optional[Set[str]] = None,
                  env: Optional[Dict[str, str]] = None,
                  **kwargs):
-        self.id = self.created_count
-        self.created_count += 1
+        self.id = Cmd.created_count
+        Cmd.created_count += 1
         self.counter = 0
 
         self.cmd = cmd
@@ -112,6 +112,7 @@ class Cmd:
 
         if pretend:
             logger.info(process_started_msg)
+            logger.debug(f'Launching {self.id}-{self.counter} {self.cmd} **{kwargs}')
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
@@ -120,7 +121,7 @@ class Cmd:
         if 'stderr' not in kwargs:
             kwargs['stderr'] = open(f'{self.fs_friendly_name}-{self.id}-{self.counter}.stderr', 'wb')
 
-        logger.debug(f'Launching {self.cmd} **{kwargs}')
+        logger.debug(f'Launching {self.id}-{self.counter} {self.cmd} **{kwargs}')
         proc: sp.CompletedProcess = self.process(
             args=self.cmd,
             **kwargs)
