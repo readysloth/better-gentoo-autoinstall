@@ -45,6 +45,8 @@ class PythonCall:
 
 class Cmd:
 
+    created_count = 0
+
     def __init__(self,
                  cmd: List[str],
                  hooks: Optional[Tuple[Callable[['Cmd'],
@@ -59,6 +61,8 @@ class Cmd:
                  keywords: Optional[Set[str]] = None,
                  env: Optional[Dict[str, str]] = None,
                  **kwargs):
+        self.id = self.created_count
+        self.created_count += 1
         self.counter = 0
 
         self.cmd = cmd
@@ -112,9 +116,9 @@ class Cmd:
 
         self.before(self)
         if 'stdout' not in kwargs:
-            kwargs['stdout'] = open(f'{self.fs_friendly_name}-{self.counter}.stdout', 'wb')
+            kwargs['stdout'] = open(f'{self.fs_friendly_name}-{self.id}-{self.counter}.stdout', 'wb')
         if 'stderr' not in kwargs:
-            kwargs['stderr'] = open(f'{self.fs_friendly_name}-{self.counter}.stderr', 'wb')
+            kwargs['stderr'] = open(f'{self.fs_friendly_name}-{self.id}-{self.counter}.stderr', 'wb')
 
         logger.debug(f'Launching {self.cmd} **{kwargs}')
         proc: sp.CompletedProcess = self.process(
