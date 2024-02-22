@@ -182,6 +182,7 @@ class Package(ShellCmd):
                  prefetch: bool = True,
                  **kwargs):
         self.emerge_override = emerge_override
+        self.is_prefetch_proc = '--fetchonly' in self.emerge_override
 
         self.use_flags = use_flags
         if type(use_flags) == list:
@@ -205,6 +206,8 @@ class Package(ShellCmd):
                                             .replace('_', '.') \
                                             .replace('>', '') \
                                             .replace('<', '')
+        if self.is_prefetch_proc:
+            self.fs_friendly_name = f'prefetch-{self.fs_friendly_name}'
         self.useflags_file = self.package_use_dir / self.fs_friendly_name
         self.cmd = f'emerge {self.emerge_override} {self.package}'
 
@@ -233,7 +236,7 @@ class Package(ShellCmd):
 
         super().__init__(
             self.cmd,
-            name=package + ('-prefetch' if '--fetchonly' in self.emerge_override else ''),
+            name=package + ('-prefetch' if self.is_prefetch_proc else ''),
             desc=description,
             **kwargs
         )
@@ -252,7 +255,7 @@ class Package(ShellCmd):
                 use.write(f'{self.package} {self.use_flags}')
 
         proc = super().__call__(**kwargs)
-        if '--fetchonly' in self.emerge_override:
+        if self.is_prefetch_proc:
             self.prefetch_procs.append(proc)
         return proc
 
