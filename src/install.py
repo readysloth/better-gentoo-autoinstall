@@ -8,7 +8,6 @@ import pkg
 import disk
 import stage3
 
-from typing import List
 from operator import itemgetter
 from conf_files import (add_variable_to_file,
                         add_value_to_variable)
@@ -179,10 +178,11 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.BLOCKING_PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
+    chroot_cmds.append(pkg.WORLD(pretend=pretend))
+
     for cmd in POST_INSTALL:
         chroot_cmds.append(cmd(pretend=pretend))
 
-    chroot_cmds.append(pkg.WORLD(pretend=pretend))
     commands_decl = []
     commands_decl += conf_pretend
     commands_decl += pkg.PORTAGE_SETUP
