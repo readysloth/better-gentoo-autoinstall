@@ -210,7 +210,7 @@ class Package(ShellCmd):
         if self.is_prefetch_proc:
             self.fs_friendly_name = f'prefetch-{self.fs_friendly_name}'
         self.useflags_file = self.package_use_dir / self.fs_friendly_name
-        self.cmd = f'emerge {self.emerge_override} {self.package}'
+        self.cmd = f'emerge {self.emerge_override} --autounmask-write {self.package}'
 
         description = self.use_flags
         if 'desc' in kwargs:
@@ -255,7 +255,17 @@ class Package(ShellCmd):
             with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
-        proc = super().__call__(**kwargs)
+        proc = None
+        max_retries = 3
+        for i in range(max_retries + 1):
+            try:
+                proc = super().__call__(**kwargs)
+                ETC_UPDATE(pretend=pretend)
+            except RuntimeError:
+                if i == max_retries:
+                    raise
+            else:
+                break
         if self.is_prefetch_proc:
             self.prefetch_procs.append(proc)
         return proc
@@ -326,3 +336,6 @@ class OptionalCommands:
 
     def __str__(self) -> str:
         return '\n'.join([str(e) for e in self.exec_list if e])
+
+
+ETC_UPDATE = ShellCmd('echo -5 | etc-update')

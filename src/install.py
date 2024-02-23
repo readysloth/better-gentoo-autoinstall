@@ -14,7 +14,7 @@ from conf_files import (add_variable_to_file,
 
 from cursed_handler import CursesHandler
 
-from cmd import ShellCmd
+from cmd import ShellCmd, ETC_UPDATE
 
 CHROOT_SCRIPT_PRETEND = [
     ShellCmd('cat > chroot_script.sh << EOF\n%placeholder%\nEOF',
@@ -187,8 +187,8 @@ def install(disk_node: str, pretend: bool = False):
         except RuntimeError:
             if i == max_retries:
                 raise
-            world_install.append(pkg.ETC_UPDATE)
-            chroot_cmds.append(pkg.ETC_UPDATE(pretend=pretend))
+            world_install.append(ETC_UPDATE)
+            chroot_cmds.append(ETC_UPDATE(pretend=pretend))
         else:
             break
 

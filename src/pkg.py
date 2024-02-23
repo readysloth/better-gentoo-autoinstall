@@ -37,6 +37,7 @@ GLOBAL_USE_FLAGS = [
 
 
 PORTAGE_SETUP = [
+    ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
     ShellCmd('emerge-webrsync',
              critical=True),
     Package('sys-apps/portage',
@@ -48,7 +49,6 @@ PORTAGE_SETUP = [
     Package('app-portage/cpuid2cpuflags',
             critical=True),
     ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
-    ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
     ShellCmd('mkdir -p /etc/portage/env'),
     ShellCmd('mkdir -p /etc/portage/profile'),
     Package('app-portage/mirrorselect',
@@ -71,9 +71,6 @@ WORLD = Package('@world',
                                           '--backtrack=100',
                                           '--autounmask-write',
                                           '--keep-going']))
-
-ETC_UPDATE = ShellCmd('echo -5 | etc-update')
-
 
 BLOCKING_PACKAGES = [
     # earliest to emerge packages
