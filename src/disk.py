@@ -7,6 +7,9 @@ LVM_GROUP = f'vg0{random.randint(1, 10)}'
 
 
 DISK_PREPARE = [
+    ShellCmd('umount -R /mnt/gentoo',
+             name='umount',
+             desc='umount of possible mounts to /mnt/gentoo'),
     ShellCmd('wipefs -af %placeholder%',
              critical=True,
              name='wipefs',
