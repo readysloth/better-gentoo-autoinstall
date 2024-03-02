@@ -31,7 +31,7 @@ GLOBAL_USE_FLAGS = [
     'openmp', 'zstd', 'jumbo-build', 'asm',
     'device-mapper', 'gtk', 'vulkan', 'sdl',
     'osmesa', 'xinerama', 'v4l', 'opengl',
-    'screencast',
+    'screencast', 'io-uring',
     '-wayland', '-gnome', '-gnome-online-accounts', '-eds'
 ]
 
@@ -147,6 +147,7 @@ PACKAGES = [
     Package('net-vpn/tor'),
     Package('net-wireless/iw'),
     Package('net-wireless/wireless-tools'),
+    Package('sys-apps/bfs'),
     Package('sys-apps/inxi'),
     Package('sys-apps/lm-sensors'),
     Package('sys-apps/lshw'),
@@ -242,7 +243,7 @@ PACKAGES = [
             extra_use_flags='connection-sharing elogind iptables'),
     Package('app-emulation/qemu',
             use_flags=['aio', 'alsa', 'capstone', 'fdt',
-                       'fuse', 'io-uring', 'iscisi', 'plugins',
+                       'fuse', 'iscisi', 'plugins',
                        'sdl-image', 'vnc', 'vhost-net',
                        'spice', 'ssh', 'usb', 'usbredir',
                        'QEMU_USER_TARGETS_AARCH64',
