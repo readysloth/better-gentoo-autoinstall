@@ -34,13 +34,8 @@ DISK_PREPARE = [
              name='parted',
              desc='disk partitioning')
     for script in ['mklabel gpt',
-                   'mkpart primary 1MiB 1GiB',
-                   'name 1 boot',
-                   'set 1 boot on',
-
-                   'mkpart primary 1GiB -1',
-                   'name 2 lvm',
-                   'set 2 lvm on']
+                   'mkpart boot fat32 1MiB 1GiB',
+                   'mkpart fs lvm 1GiB -1']
 ]
 
 DISK_LVM_FIN = [
