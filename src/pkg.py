@@ -31,7 +31,7 @@ GLOBAL_USE_FLAGS = [
     'openmp', 'zstd', 'jumbo-build', 'asm',
     'device-mapper', 'gtk', 'vulkan', 'sdl',
     'osmesa', 'xinerama', 'v4l', 'opengl',
-    'screencast', 'io-uring',
+    'screencast', 'io-uring', 'xattr',
     '-wayland', '-gnome', '-gnome-online-accounts', '-eds'
 ]
 
@@ -117,6 +117,7 @@ PACKAGES = [
     Package('app-admin/doas'),
     Package('app-admin/pass-otp'),
     Package('app-arch/unrar'),
+    Package('app-backup/snapper'),
     Package('app-containers/docker'),
     Package('app-containers/docker-cli'),
     Package('app-containers/docker-compose'),
