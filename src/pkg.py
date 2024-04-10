@@ -314,6 +314,9 @@ PACKAGES = [
                             'material', 'netgen', 'part-design',
                             'show', 'surface', 'techdraw',
                             'openscad', 'raytracing']),
+
+         # freecad dependency, doesn't play well with `threads`
+         Package('sci-libs/hdf5', use_flags='-threads'),
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
          Package('app-admin/conky',
