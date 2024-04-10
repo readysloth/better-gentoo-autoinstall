@@ -300,7 +300,7 @@ PACKAGES = [
          Package('sys-apps/ripgrep-all'),
          Package('app-emulation/virt-manager', use_flags='gui'),
          Package('media-gfx/gimp', use_flags='webp lua'),
-         Package('dev-util/valgrind', keywords={'dev'}),
+         Package('dev-debug/valgrind', keywords={'dev'}),
          Package('app-forensics/aflplusplus', keywords={'dev'}),
          Package('net-proxy/privoxy',
                  use_flags=['compression',
