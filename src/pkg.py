@@ -317,6 +317,9 @@ PACKAGES = [
 
          # freecad dependency, doesn't play well with `threads`
          Package('sci-libs/hdf5', use_flags='-threads'),
+         # freecad dependency, implicit requirements on these use-flags
+         Package('dev-python/pyside2', use_flags='positioning quick qml'),
+
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
          Package('app-admin/conky',
