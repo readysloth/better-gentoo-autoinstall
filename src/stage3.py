@@ -5,7 +5,11 @@ import urllib.request as ur
 from cmd import ShellCmd
 
 
-STAGE3_DOWNLOAD = ShellCmd('curl -L "%placeholder%" -o stage3',
+STAGE3_DOWNLOAD = ShellCmd('for _ in $(seq 4); do '
+                           'curl -L "%placeholder%" -o stage3;'
+                           'grep -q "404 Not Found" stage3 || break;'
+                           'sleep 1;'
+                           'done',
                            critical=True,
                            name='stage3 download',
                            desc='download of stage3 archive')
