@@ -41,6 +41,8 @@ def main(args):
         for line in install.pretend_script(args.disk):
             print(line)
         return
+
+    install.setup_logging()
     logger = logging.getLogger()
     try:
         install.install(args.disk)
