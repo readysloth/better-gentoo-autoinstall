@@ -251,7 +251,7 @@ class Package(ShellCmd):
                     super().__call__(pretend=pretend, **kwargs),
                     self.after(pretend=pretend)]
 
-        if not self.binary:
+        if not self.binary and '@' not in str(self.useflags_file):
             with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
