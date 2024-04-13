@@ -183,9 +183,11 @@ class Package(ShellCmd):
                  use_flags: Union[List[str], str] = '',
                  extra_use_flags: Union[List[str], str] = '',
                  prefetch: bool = True,
+                 mask: bool = False,
                  **kwargs):
         self.emerge_override = emerge_override
         self.is_prefetch_proc = '--fetchonly' in self.emerge_override
+        self.mask = mask
 
         self.use_flags = use_flags
         if type(use_flags) == list:
@@ -226,6 +228,12 @@ class Package(ShellCmd):
         if self.package.startswith('@'):
             prefetch = False
 
+        # maybe this class is overworked already
+        if self.mask:
+            # masking can't be non-blocking
+            kwargs['blocking'] = True
+            self.cmd = f'echo "{self.package}" >> {self.package_mask_dir}/{self.fs_friendly_name}'
+
         if prefetch and not (kwargs['critical'] or kwargs['blocking']):
             kwargs['hooks'] = [Package(self.package,
                                        emerge_override='--fetchonly --deep',
@@ -252,6 +260,10 @@ class Package(ShellCmd):
             return [self.before(pretend=pretend),
                     super().__call__(pretend=pretend, **kwargs),
                     self.after(pretend=pretend)]
+
+        if self.mask:
+            self.package_mask_dir.mkdir(exist_ok=True)
+            return super().__call__(**kwargs)
 
         if not self.binary and '@' not in str(self.useflags_file):
             with open(self.useflags_file, 'a') as use:

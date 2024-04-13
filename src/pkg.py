@@ -35,6 +35,10 @@ GLOBAL_USE_FLAGS = [
     '-wayland', '-gnome', '-gnome-online-accounts', '-eds'
 ]
 
+MASKED = [
+
+]
+
 
 PORTAGE_SETUP = [
     ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
@@ -86,7 +90,7 @@ TROUBLESOME_PACKAGES = [
 ]
 
 
-BLOCKING_PACKAGES = [
+BLOCKING_PACKAGES = MASKED + [
     # earliest to emerge packages
     # other packages indirectly depend
     # on those
