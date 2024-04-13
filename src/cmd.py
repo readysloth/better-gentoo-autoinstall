@@ -75,7 +75,9 @@ class Cmd:
                                              .replace('<', '')
         self.blocking = blocking
         self.critical = critical
-        self.env = env or {}
+        self.env = dict(os.environ)
+        if env:
+            self.env = {**self.env, **env}
         self.keywords = keywords or set()
         self.ignore_change = ignore_change
         self.process = ft.partial(
