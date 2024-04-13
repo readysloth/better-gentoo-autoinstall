@@ -191,7 +191,7 @@ def install(disk_node: str, pretend: bool = False):
             chroot_cmds.append(pkg.WORLD(pretend=pretend))
         except RuntimeError:
             if i == max_retries:
-                raise
+                break
             world_install.append(ETC_UPDATE)
             chroot_cmds.append(ETC_UPDATE(pretend=pretend))
         else:
