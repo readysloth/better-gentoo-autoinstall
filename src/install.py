@@ -174,8 +174,6 @@ def install(disk_node: str, pretend: bool = False):
 
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
-        if not pretend:
-            chroot_cmds[-1].wait()
 
     for cmd in pkg.BLOCKING_PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
