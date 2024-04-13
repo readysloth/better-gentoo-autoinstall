@@ -72,6 +72,20 @@ WORLD = Package('@world',
                                           '--autounmask-write',
                                           '--keep-going']))
 
+
+TROUBLESOME_PACKAGES = [
+    Package('sys-libs/ncurses',
+            emerge_override='--nodeps',
+            env={'USE': '-gpm'},
+            blocking=True),
+    Package('sys-libs/gpm',
+            emerge_override='--nodeps',
+            blocking=True),
+    Package('sys-libs/ncurses',
+            blocking=True),
+]
+
+
 BLOCKING_PACKAGES = [
     # earliest to emerge packages
     # other packages indirectly depend
@@ -94,20 +108,10 @@ BLOCKING_PACKAGES = [
             blocking=True),
     Package('sys-kernel/linux-firmware',
             use_flags='compress-xz deduplicate'),
-    Package('sys-libs/ncurses',
-            emerge_override='--nodeps',
-            env={'USE': '-gpm'},
-            blocking=True),
-    Package('sys-libs/gpm',
-            emerge_override='--nodeps',
-            blocking=True),
-    Package('sys-libs/ncurses',
-            blocking=True),
     Package('sys-apps/portage',
             extra_use_flags='native-extensions ipc',
             blocking=True),
 ]
-
 
 PACKAGES = [
     Package('dev-util/ccache',

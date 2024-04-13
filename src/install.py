@@ -175,11 +175,32 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
+    for cmd in pkg.TROUBLESOME_PACKAGES:
+        chroot_cmds.append(cmd(pretend=pretend))
+
     for cmd in pkg.BLOCKING_PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
 
     max_retries = 5
     world_install = []
+
+    # autounmask everything needed
+    for i in range(max_retries + 1):
+        try:
+            world_install.append(pkg.WORLD)
+            chroot_cmds.append(pkg.WORLD(pretend=pretend))
+        except RuntimeError:
+            if i == max_retries:
+                raise
+            world_install.append(ETC_UPDATE)
+            chroot_cmds.append(ETC_UPDATE(pretend=pretend))
+        else:
+            break
+
+    for cmd in pkg.TROUBLESOME_PACKAGES:
+        chroot_cmds.append(cmd(pretend=pretend))
+
+    # actual installation
     for i in range(max_retries + 1):
         try:
             world_install.append(pkg.WORLD)
