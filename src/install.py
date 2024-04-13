@@ -183,6 +183,7 @@ def install(disk_node: str, pretend: bool = False):
 
     max_retries = 5
     world_install = []
+    install_on_autounmask = False
 
     # autounmask everything needed
     for i in range(max_retries + 1):
@@ -195,23 +196,25 @@ def install(disk_node: str, pretend: bool = False):
             world_install.append(ETC_UPDATE)
             chroot_cmds.append(ETC_UPDATE(pretend=pretend))
         else:
-            break
+            install_on_autounmask = True
 
-    for cmd in pkg.TROUBLESOME_PACKAGES:
-        chroot_cmds.append(cmd(pretend=pretend))
+    # we are not lucky and should again emerge troublesome packages
+    # and update @world
+    if not install_on_autounmask:
+        for cmd in pkg.TROUBLESOME_PACKAGES:
+            chroot_cmds.append(cmd(pretend=pretend))
 
-    # actual installation
-    for i in range(max_retries + 1):
-        try:
-            world_install.append(pkg.WORLD)
-            chroot_cmds.append(pkg.WORLD(pretend=pretend))
-        except RuntimeError:
-            if i == max_retries:
-                raise
-            world_install.append(ETC_UPDATE)
-            chroot_cmds.append(ETC_UPDATE(pretend=pretend))
-        else:
-            break
+        for i in range(max_retries + 1):
+            try:
+                world_install.append(pkg.WORLD)
+                chroot_cmds.append(pkg.WORLD(pretend=pretend))
+            except RuntimeError:
+                if i == max_retries:
+                    raise
+                world_install.append(ETC_UPDATE)
+                chroot_cmds.append(ETC_UPDATE(pretend=pretend))
+            else:
+                break
 
     for cmd in POST_INSTALL:
         chroot_cmds.append(cmd(pretend=pretend))
