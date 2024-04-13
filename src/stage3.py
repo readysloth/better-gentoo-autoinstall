@@ -17,6 +17,7 @@ STAGE3_DOWNLOAD = ShellCmd('for _ in $(seq 4); do '
 
 STAGE3 = [
     ShellCmd('[ $(date +%s) -lt $(date +%s -r /etc/fstab) ] && date +%s -s@ $(date +%s -r /etc/fstab)',
+             critical=False,
              name='system time consistency',
              desc='setting system time to installer iso if needed'),
     ShellCmd('sysctl net.ipv6.conf.all.disable_ipv6=1',
