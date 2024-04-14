@@ -9,7 +9,9 @@ disk.py
 install.py
 pkg.py
 run.py
-stage3.py"
+stage3.py
+keywords.py
+"
 
 FOLDER=installation_scripts
 
