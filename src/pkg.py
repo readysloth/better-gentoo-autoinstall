@@ -340,6 +340,11 @@ PACKAGES = [
          Package('sci-libs/hdf5', use_flags='-threads'),
          # freecad dependency, implicit requirements on these use-flags
          Package('dev-python/pyside2', use_flags='positioning quick qml'),
+         # pulled in by some packages, adding it explicitly
+         # we minimize troubles with it
+         Package('dev-qt/qtwebengine',
+                 use_flags='-designer -webdriver',
+                 keywords={'ram-hog'}),
 
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
