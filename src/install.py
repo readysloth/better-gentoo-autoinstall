@@ -7,6 +7,7 @@ import subprocess as sp
 import pkg
 import disk
 import stage3
+import keywords
 
 from operator import itemgetter
 from conf_files import (add_variable_to_file,
@@ -171,6 +172,9 @@ def install(disk_node: str, pretend: bool = False):
     conf_pretend.append(
         add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd), pretend=True)
     )
+
+    for cmd in pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES:
+        keywords.process_keywords(cmd, pretend=pretend)
 
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
