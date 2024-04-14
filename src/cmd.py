@@ -253,6 +253,7 @@ class Package(ShellCmd):
         )
 
     def __call__(self,
+                 *args,
                  pretend: bool = False,
                  **kwargs) -> Union[List[sp.CompletedProcess],
                                     sp.CompletedProcess]:
