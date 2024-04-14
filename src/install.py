@@ -173,8 +173,8 @@ def install(disk_node: str, pretend: bool = False):
         add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd), pretend=True)
     )
 
-    for cmd in pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES:
-        keywords.process_keywords(cmd, pretend=pretend)
+    all_packages = pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES
+    keywords.process_keywords(all_packages, pretend=pretend)
 
     for cmd in pkg.PACKAGES:
         chroot_cmds.append(cmd(pretend=pretend))
