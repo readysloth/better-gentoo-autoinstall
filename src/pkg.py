@@ -40,7 +40,18 @@ MASKED = [
 ]
 
 
+AVAILABLE_MEMORY = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+TMPFS_MEMORY = AVAILABLE_MEMORY // 3
+REMAINING_MEMORY = AVAILABLE_MEMORY - TMPFS_MEMORY
+
+TMPFS = ShellCmd(f'mount -t tmpfs -o size={TMPFS_MEMORY} tmpfs /var/tmp/portage')
+# less than 10 GiB
+if REMAINING_MEMORY < 10 * 1024 * 1024 * 1024:
+    TMPFS = ShellCmd('true')
+
+
 PORTAGE_SETUP = [
+    TMPFS,
     ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
     ShellCmd('emerge-webrsync',
              critical=True),
