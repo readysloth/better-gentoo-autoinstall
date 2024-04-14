@@ -51,13 +51,13 @@ if REMAINING_MEMORY < 10 * 1024 * 1024 * 1024:
 
 
 PORTAGE_SETUP = [
-    TMPFS,
     ShellCmd('touch /etc/portage/package.use/zzz_autounmask'),
     ShellCmd('emerge-webrsync',
              critical=True),
     Package('sys-apps/portage',
             emerge_override='--oneshot',
             critical=True),
+    TMPFS,
     Package('app-portage/gentoolkit',
             critical=True),
     ShellCmd('eselect profile set --force 6'),
