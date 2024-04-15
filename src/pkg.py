@@ -58,6 +58,8 @@ PORTAGE_SETUP = [
             emerge_override='--oneshot',
             critical=True),
     TMPFS,
+    Package('net-misc/ntp', critical=True),
+    ShellCmd('rc-service ntp-client start', critical=True),
     Package('app-portage/gentoolkit',
             critical=True),
     ShellCmd('eselect profile set --force 6'),

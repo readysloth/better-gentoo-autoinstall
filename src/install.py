@@ -32,6 +32,7 @@ MOUNT_BOOT = ShellCmd('mount %placeholder% /mnt/gentoo/boot',
 USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
 
 POST_INSTALL = [
+    ShellCmd('rc-update add ntp-client default'),
     ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
              name='user creation'),
     ShellCmd('mkdir /home/user/.config'),
