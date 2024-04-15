@@ -37,6 +37,7 @@ def ram_hog(pkg: Package):
     jobs = free_ram_ratio * AVAILABLE_MEMORY // two_gigs
     if jobs > mp.cpu_count():
         jobs = mp.cpu_count()
+    jobs = int(jobs)
 
     with open('/etc/portage/env/nproc.conf', 'w') as f:
         f.writelines([f'MAKEOPTS="-j{jobs}"'])
