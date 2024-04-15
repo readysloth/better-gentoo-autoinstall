@@ -70,7 +70,7 @@ PORTAGE_SETUP = [
     ShellCmd('mkdir -p /etc/portage/profile'),
     Package('app-portage/mirrorselect',
             critical=True),
-    ShellCmd('mirrorselect -s15 -4 -D',
+    ShellCmd('mirrorselect -s10 -4',
              name='mirrorselect',
              desc='search for best mirrors'),
     ShellCmd('perl-cleaner --reallyall'),
