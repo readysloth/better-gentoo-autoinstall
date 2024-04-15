@@ -5,7 +5,11 @@ from typing import List
 from pathlib import Path
 from collections import defaultdict
 
-from cmd import Cmd, Package
+from cmd import (Cmd,
+                 Package,
+                 IfKeyword,
+                 IfNotKeyword,
+                 OptionalCommands)
 
 
 AVAILABLE_MEMORY = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
@@ -45,10 +49,17 @@ def process_keywords(cmds: List[Cmd], pretend: bool = False):
     for cmd in cmds:
         if pretend:
             continue
-        if hasattr(cmd, 'keywords'):
-            for keyword in cmd.keywords:
-                if keyword in HANDLER_MAP:
-                    HANDLER_MAP[keyword](cmd)
+        keywords = set()
+        if type(cmd) == OptionalCommands:
+            process_keywords(cmd.exec_list)
+            continue
+        elif type(cmd) in [IfKeyword, IfNotKeyword]:
+            keywords.update(cmd.exec.keywords)
+        else:
+            keywords = cmd.keywords
+        for keyword in keywords:
+            if keyword in HANDLER_MAP:
+                HANDLER_MAP[keyword](cmd)
 
 
 HANDLER_MAP = defaultdict(
