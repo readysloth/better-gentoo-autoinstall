@@ -46,7 +46,8 @@ def process_keywords(cmds: List[Cmd], pretend: bool = False):
         for keyword in cmd.keywords:
             if pretend:
                 continue
-            HANDLER_MAP[keyword](cmd)
+            if keyword in HANDLER_MAP:
+                HANDLER_MAP[keyword](cmd)
 
 
 HANDLER_MAP = defaultdict(
