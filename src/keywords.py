@@ -49,15 +49,12 @@ def process_keywords(cmds: List[Cmd], pretend: bool = False):
     for cmd in cmds:
         if pretend:
             continue
-        keywords = set()
         if type(cmd) == OptionalCommands:
             process_keywords(cmd.exec_list)
             continue
         elif type(cmd) in [IfKeyword, IfNotKeyword]:
-            keywords.update(cmd.exec.keywords)
-        else:
-            keywords = cmd.keywords
-        for keyword in keywords:
+            cmd = cmd.exec
+        for keyword in cmd.keywords:
             if keyword in HANDLER_MAP:
                 HANDLER_MAP[keyword](cmd)
 
