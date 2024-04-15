@@ -26,6 +26,8 @@ CHROOT_SCRIPT_PRETEND = [
              name='chroot install')
 ]
 
+GCC_MARCH = ShellCmd('resolve-march-native')
+
 MOUNT_BOOT = ShellCmd('mount %placeholder% /mnt/gentoo/boot',
                       name='boot mount')
 
@@ -111,8 +113,10 @@ def install(disk_node: str, pretend: bool = False):
 
     make_conf_path = '/etc/portage/make.conf'
     conf_pretend = []
+
+    parallel_jobs = 4
     if not pretend:
-        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', '-march=native')
+        add_variable_to_file(make_conf_path, 'EMERGE_DEFAULT_OPTS', f'--jobs={parallel_jobs}')
         add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch')
         add_variable_to_file(make_conf_path, 'ACCEPT_LICENSE', '*')
         add_variable_to_file(make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS))
@@ -122,10 +126,7 @@ def install(disk_node: str, pretend: bool = False):
         add_variable_to_file(make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc')
 
     conf_pretend.append(
-        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', '-march=native', pretend=True)
-    )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch', pretend=True)
+        add_variable_to_file(make_conf_path, 'EMERGE_DEFAULT_OPTS', f'--jobs={parallel_jobs}', pretend=True)
     )
     conf_pretend.append(
         add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch', pretend=True)
@@ -153,6 +154,17 @@ def install(disk_node: str, pretend: bool = False):
 
     for cmd in pkg.PORTAGE_SETUP:
         chroot_cmds.append(cmd(pretend=pretend))
+
+    gcc_march_proc = GCC_MARCH(stdout=sp.PIPE, pretend=pretend)
+    march_flags = '-march=native'
+    if not pretend:
+        march_flags = gcc_march_proc.stdout.read().decode().strip()
+        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', march_flags)
+
+    conf_pretend.append(
+        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', march_flags, pretend=True)
+    )
+    executed_cmds.append([[gcc_march_proc], [GCC_MARCH]])
 
     aria_cmd = [r"/usr/bin/aria2c",
                 r"--dir=\${DISTDIR}",

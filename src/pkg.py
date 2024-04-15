@@ -77,6 +77,7 @@ PORTAGE_SETUP = [
     Package('net-misc/aria2',
             extra_use_flags='bittorent libuv ssh',
             critical=True),
+    Package('app-misc/resolve-march-native', critical=True)
 ]
 
 
