@@ -1,5 +1,6 @@
 import os
 import logging
+import threading
 import functools as ft
 import subprocess as sp
 
@@ -139,6 +140,10 @@ class Cmd:
             if proc.returncode != 0:
                 raise RuntimeError(f'Critical process returned non-zero code ({proc.returncode}): {repr(self)}')
         self.after(self, proc)
+
+        # reap the zombies
+        if not pretend:
+            threading.Thread(target=proc.wait).start()
         return proc
 
     def __repr__(self) -> str:
