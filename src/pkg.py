@@ -42,7 +42,7 @@ MASKED = [
 
 
 AVAILABLE_MEMORY = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
-TMPFS_MEMORY = AVAILABLE_MEMORY // 3
+TMPFS_MEMORY = AVAILABLE_MEMORY * 0.4
 REMAINING_MEMORY = AVAILABLE_MEMORY - TMPFS_MEMORY
 
 TMPFS = ShellCmd(f'mount -t tmpfs -o size={TMPFS_MEMORY} tmpfs /var/tmp/portage')

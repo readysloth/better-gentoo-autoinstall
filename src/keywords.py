@@ -33,7 +33,7 @@ def ram_hog(pkg: Package):
 
     # ~ 2GiB per compilation thread
     two_gigs = 2 * 1024 * 1024 * 1024
-    free_ram_ratio = 0.3
+    free_ram_ratio = 0.4
     jobs = (1 - free_ram_ratio) * AVAILABLE_MEMORY // two_gigs
     if jobs > mp.cpu_count():
         jobs = mp.cpu_count()
