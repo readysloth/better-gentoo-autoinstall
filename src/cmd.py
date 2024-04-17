@@ -76,7 +76,7 @@ class Cmd:
                                              .replace('<', '')
         self.blocking = blocking
         self.critical = critical
-        self.env = dict(os.environ)
+        self.env = {}
         if env:
             self.env = {**self.env, **env}
         self.keywords = keywords or set()
