@@ -3,6 +3,7 @@ import json
 import logging
 import itertools as it
 import subprocess as sp
+import functools as ft
 
 import pkg
 import disk
@@ -112,45 +113,43 @@ def install(disk_node: str, pretend: bool = False):
     executed_cmds.append([chroot_prepare, CHROOT_SCRIPT_PRETEND])
 
     make_conf_path = '/etc/portage/make.conf'
-    conf_pretend = []
+    conf_jobs = []
+    conf_jobs_executed = []
 
     parallel_jobs = 4
-    if not pretend:
-        add_variable_to_file(make_conf_path, 'EMERGE_DEFAULT_OPTS', f'--jobs={parallel_jobs}')
-        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch')
-        add_variable_to_file(make_conf_path, 'ACCEPT_LICENSE', '*')
-        add_variable_to_file(make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS))
-        add_variable_to_file(make_conf_path, 'PORTAGE_IONICE_COMMAND', r'ionice -c 3 -p \${PID}')
-        add_variable_to_file(make_conf_path, 'ACCEPT_KEYWORDS', '~amd64 amd64 x86')
-        add_variable_to_file(make_conf_path, 'INPUT_DEVICES', 'synaptics libinput')
-        add_variable_to_file(make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc')
-
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'EMERGE_DEFAULT_OPTS', f'--jobs={parallel_jobs}', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'EMERGE_DEFAULT_OPTS', f'--jobs={parallel_jobs}')
     )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'FEATURES', 'parallel-install parallel-fetch', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'FEATURES', 'parallel-install parallel-fetch ccache')
     )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'ACCEPT_LICENSE', '*', pretend=True))
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS), pretend=True))
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'PORTAGE_IONICE_COMMAND', r'ionice -c 3 -p \${PID}', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'CCACHE_DIR', '/var/cache/ccache')
     )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'ACCEPT_KEYWORDS', '~amd64 amd64 x86', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'ACCEPT_LICENSE', '*')
     )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'INPUT_DEVICES', 'synaptics libinput', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'USE', ' '.join(pkg.GLOBAL_USE_FLAGS))
     )
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc', pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'PORTAGE_IONICE_COMMAND', r'ionice -c 3 -p \${PID}')
+    )
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'ACCEPT_KEYWORDS', '~amd64 amd64 x86')
+    )
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'INPUT_DEVICES', 'synaptics libinput')
+    )
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'GRUB_PLATFORMS', 'emu efi-64 pc')
     )
 
     chroot_cmds = []
-    for cmd in conf_pretend:
-        chroot_cmds.append(cmd(pretend=True))
+    for cmd in conf_jobs:
+        cmd_obj = cmd(pretend=pretend)
+        chroot_cmds.append(cmd_obj)
+        conf_jobs_executed.append(cmd_obj)
 
     for cmd in pkg.PORTAGE_SETUP:
         chroot_cmds.append(cmd(pretend=pretend))
@@ -161,10 +160,10 @@ def install(disk_node: str, pretend: bool = False):
         march_flags = gcc_march_proc.stdout.read().decode().strip()
         add_value_to_variable(make_conf_path, 'COMMON_FLAGS', march_flags)
 
-    conf_pretend.append(
-        add_value_to_variable(make_conf_path, 'COMMON_FLAGS', march_flags, pretend=True)
+    conf_jobs = []
+    conf_jobs.append(
+        ft.partial(add_value_to_variable, make_conf_path, 'COMMON_FLAGS', march_flags)
     )
-    executed_cmds.append([[gcc_march_proc], [GCC_MARCH]])
 
     aria_cmd = [r"/usr/bin/aria2c",
                 r"--dir=\${DISTDIR}",
@@ -180,11 +179,13 @@ def install(disk_node: str, pretend: bool = False):
                 r"--max-connection-per-server=2",
                 r"--uri-selector=inorder \${URI}"]
 
-    if not pretend:
-        add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd))
-    conf_pretend.append(
-        add_variable_to_file(make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd), pretend=True)
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, make_conf_path, 'FETCHCOMMAND', ' '.join(aria_cmd))
     )
+    for cmd in conf_jobs:
+        cmd_obj = cmd(pretend=pretend)
+        chroot_cmds.append(cmd_obj)
+        conf_jobs_executed.append(cmd_obj)
 
     all_packages = pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES
     keywords.process_keywords(all_packages, pretend=pretend)
@@ -237,7 +238,7 @@ def install(disk_node: str, pretend: bool = False):
         chroot_cmds.append(cmd(pretend=pretend))
 
     commands_decl = []
-    commands_decl += conf_pretend
+    commands_decl += conf_jobs_executed
     commands_decl += pkg.PORTAGE_SETUP
     commands_decl += pkg.BLOCKING_PACKAGES
     commands_decl += pkg.PACKAGES
