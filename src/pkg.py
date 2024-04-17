@@ -334,24 +334,24 @@ PACKAGES = [
                  use_flags=['compression',
                             'fast-redirects',
                             'whitelists',
-                            'threads',
                             'extended-statistics']),
-         Package('media-gfx/freecad',
-                 use_flags=['addonmgr', 'designer', 'fem',
-                            'gui', 'image', 'inspection',
-                            'material', 'netgen', 'part-design',
-                            'show', 'surface', 'techdraw',
-                            'openscad', 'raytracing']),
+         # uncomment if you are either brave or desperate enough
+         # Package('media-gfx/freecad',
+         #         use_flags=['addonmgr', 'designer', 'fem',
+         #                    'gui', 'image', 'inspection',
+         #                    'material', 'netgen', 'part-design',
+         #                    'show', 'surface', 'techdraw',
+         #                    'openscad', 'raytracing']),
 
-         # freecad dependency, doesn't play well with `threads`
-         Package('sci-libs/hdf5', use_flags='-threads'),
-         # freecad dependency, implicit requirements on these use-flags
-         Package('dev-python/pyside2', use_flags='positioning quick qml'),
-         # pulled in by some packages, adding it explicitly
-         # we minimize troubles with it
-         Package('dev-qt/qtwebengine',
-                 use_flags='-designer -webdriver',
-                 keywords={'ram-hog'}),
+         # # freecad dependency, doesn't play well with `threads`
+         # Package('sci-libs/hdf5', use_flags='-threads'),
+         # # freecad dependency, implicit requirements on these use-flags
+         # Package('dev-python/pyside2', use_flags='positioning quick qml'),
+         # # pulled in by some packages, adding it explicitly
+         # # we minimize troubles with it
+         # Package('dev-qt/qtwebengine',
+         #         use_flags='-designer -webdriver',
+         #         keywords={'ram-hog'}),
 
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
