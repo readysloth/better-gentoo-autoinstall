@@ -78,7 +78,9 @@ PORTAGE_SETUP = [
     Package('net-misc/aria2',
             extra_use_flags='bittorent libuv ssh',
             critical=True),
-    Package('app-misc/resolve-march-native', critical=True)
+    Package('app-misc/resolve-march-native', critical=True),
+    ShellCmd('mkdir -p /var/cache/ccache/'),
+    ShellCmd('chown portage:portage /var/cache/ccache/'),
 ]
 
 
