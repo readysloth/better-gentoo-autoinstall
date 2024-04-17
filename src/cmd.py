@@ -271,7 +271,7 @@ class Package(ShellCmd):
             self.package_mask_dir.mkdir(exist_ok=True)
             return super().__call__(**kwargs)
 
-        if not self.binary and '@' not in str(self.useflags_file):
+        if not self.is_prefetch_proc and not self.binary and '@' not in str(self.useflags_file):
             with open(self.useflags_file, 'a') as use:
                 use.write(f'{self.package} {self.use_flags}')
 
