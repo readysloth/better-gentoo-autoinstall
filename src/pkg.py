@@ -186,6 +186,7 @@ PACKAGES = [
     Package('sys-fs/fuse-exfat'),
     Package('sys-fs/fuse-zip'),
     Package('sys-fs/inotify-tools'),
+    Package('sys-fs/lvm2'),
     Package('sys-fs/mtools'),
     Package('sys-fs/ncdu-bin'),
     Package('sys-kernel/gentoo-kernel',
