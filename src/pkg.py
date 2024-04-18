@@ -15,7 +15,8 @@ def st_patches(*args, pretend: bool = False, **kwargs):
     patch_folder_path = '/etc/portage/patches/x11-terms/st'
     base_url = 'https://st.suckless.org/patches/'
     patches = ['alpha/st-alpha-20220206-0.8.5.diff',
-               'dynamic-cursor-color/st-dynamic-cursor-color-0.8.4.diff']
+               'dynamic-cursor-color/st-dynamic-cursor-color-0.9.diff',
+               'ligatures/0.9/st-ligatures-alpha-20240105-0.9.diff']
     os.makedirs(patch_folder_path, exist_ok=True)
     for p in patches:
         patchname = p.split('/')[1]
