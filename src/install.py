@@ -46,7 +46,7 @@ POST_INSTALL = [
              name='grub install'),
     ShellCmd(' && '.join([r'git clone --depth=1 https://github.com/AdisonCavani/distro-grub-themes.git',
                           r'mkdir -p /boot/grub/themes/gentoo',
-                          r'tar -xvf distro-grub-themes/themes/gentoo.tar -C /boot/grub/themes/gentoo',
+                          r'tar -xvf distro-grub-themes/themes/gentoo.tar -C /boot/grub/themes/gentoo --no-same-owner',
                           r'echo "GRUB_GFXMODE=1920x1080" >> /etc/default/grub',
                           r'echo "GRUB_THEME=\"/boot/grub/themes/gentoo/theme.txt\"" >> /etc/default/grub',
                           r'rm -rf distro-grub-themes']),
