@@ -618,7 +618,7 @@ git config --global core.editor vim
 cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 
 
-chown -R ${USERNAME} ${USER_HOME}
+chown -R ${USERNAME}:${USERNAME} ${USER_HOME}
 
 doas -u ${USERNAME} vim +PlugInstall +qa
 VIM_LSP_SETTINGS_SERVERS="${USER_HOME}/.local/share/vim-lsp-settings/servers"
@@ -655,8 +655,22 @@ doas -u ${USERNAME} fish -c 'fisher install IlanCosman/tide@v5'
 doas -u ${USERNAME} bash -c "
 mkdir -p ${USER_HOME}/.config/polybar;
 touch ${USER_HOME}/.config/polybar/config;
-git clone https://github.com/adi1090x/polybar-themes /tmp/polybar-themes;
+git clone https://github.com/adi1090x/polybar-themes.git /tmp/polybar-themes;
 cd /tmp/polybar-themes;
     echo 1 | ./setup.sh;
     fc-cache -v;
 "
+
+
+# rofi
+#
+doas -u ${USERNAME} bash -c "
+git clone https://github.com/adi1090x/rofi.git /tmp/rofi;
+cd /tmp/rofi;
+    ./setup.sh;
+    fc-cache -v;
+"
+
+
+# to be extra-sure
+chown -R ${USERNAME}:${USERNAME} ${USER_HOME}
