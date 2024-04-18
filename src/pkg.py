@@ -247,6 +247,7 @@ PACKAGES = [
     Package('dev-util/radare2', keywords={'dev'}),
     Package('dev-util/rr', keywords={'dev'}),
     Package('media-gfx/graphviz', keywords={'dev'}),
+    Package('sys-kernel/installkernel', use_flags='grub'),
     Package('sys-libs/libfaketime', keywords={'dev'}),
     Package('dev-lang/python',
             use_flags='gdbm readline sqlite ncurses tk ssl',
