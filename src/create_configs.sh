@@ -348,7 +348,7 @@ set -sg escape-time 1
 set -g base-index 1
 setw -g pane-base-index 1
 setw -g repeat-time 1000
-bind r source-file ${USER_HOME}/.tmux.conf \; display 'Reloaded!
+bind r source-file ${USER_HOME}/.tmux.conf \; display 'Reloaded!'
 
 bind | split-window -h -c "#{pane_current_path}"
 bind - split-window -v -c "#{pane_current_path}"
