@@ -143,7 +143,7 @@ PACKAGES = [
     Package('app-admin/doas'),
     Package('app-admin/pass-otp'),
     Package('app-arch/unrar'),
-    Package('app-backup/snapper'),
+    Package('app-backup/fsarchiver'),
     Package('app-containers/docker'),
     Package('app-containers/docker-cli'),
     Package('app-containers/docker-compose'),
