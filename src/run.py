@@ -22,6 +22,9 @@ def parse_args(args):
     install_parser.add_argument('-m', '--minimal',
                                 action='store_true',
                                 help='make installation as minimal, as possible')
+    install_parser.add_argument('-B', '--barebones',
+                                action='store_true',
+                                help='make installation less than mimimal')
     return parser.parse_args()
 
 
@@ -30,6 +33,9 @@ def main(args):
         os.environ['minimal'] = 'True'
     if args.prefer_binary:
         os.environ['binary'] = 'True'
+    if args.barebones:
+        os.environ['minimal'] = 'True'
+        os.environ['barebones'] = 'True'
 
     import install
 

@@ -214,8 +214,6 @@ PACKAGES = [
     Package('app-admin/pass', use_flags='git'),
     Package('app-admin/sysklogd', use_flags='logger'),
     Package('app-arch/zip', use_flags='natspec'),
-    Package('app-misc/hivex', use_flags='perl'),
-    Package('media-gfx/openscad', use_flags='gui'),
     Package('media-libs/libpng', use_flags='apng'),
     Package('media-libs/libpulse', use_flags='glib'),
     Package('media-libs/mesa', use_flags='d3d9 lm-sensors vdpau'),
@@ -233,20 +231,12 @@ PACKAGES = [
     Package('x11-misc/polybar', use_flags='mpd network ipc'),
 
     # packages with keywords
-    Package('app-forensics/radamsa', keywords={'dev'}),
-    Package('app-forensics/zzuf', keywords={'dev'}),
     Package('app-misc/binwalk', keywords={'dev'}),
     Package('dev-build/cmake', keywords={'dev'}),
-    Package('dev-debug/gef', keywords={'dev'}),
     Package('dev-debug/ltrace', extra_use_flags='elfutils', keywords={'dev'}),
     Package('dev-debug/strace', extra_use_flags='elfutils', keywords={'dev'}),
     Package('dev-util/bear', keywords={'dev'}),
-    Package('dev-util/cppcheck', keywords={'dev'}),
-    Package('dev-util/difftastic', keywords={'dev'}),
     Package('dev-util/poke', use_flags='nbd', keywords={'dev'}),
-    Package('dev-util/radare2', keywords={'dev'}),
-    Package('dev-util/rr', keywords={'dev'}),
-    Package('media-gfx/graphviz', keywords={'dev'}),
     Package('sys-libs/libfaketime', keywords={'dev'}),
     Package('dev-lang/python',
             use_flags='gdbm readline sqlite ncurses tk ssl',
@@ -258,12 +248,6 @@ PACKAGES = [
     Package('dev-vcs/git',
             use_flags='webdav safe-directory',
             extra_use_flags='cgi gpg highlight',
-            keywords={'dev'}),
-    Package('dev-util/android-tools',
-            extra_use_flags='python',
-            keywords={'dev'}),
-    Package('dev-dotnet/dotnet-sdk',
-            binary_alternative='dev-dotnet/dotnet-sdk-bin',
             keywords={'dev'}),
 
     # packages wth big useflags
@@ -317,6 +301,24 @@ PACKAGES = [
             hooks=[st_patches]),
 
 
+    # optional, but useful packages
+
+    OptionalCommands(
+        IfNotKeyword,
+        'barebones',
+        [Package('app-forensics/radamsa', keywords={'dev'}),
+         Package('app-forensics/zzuf', keywords={'dev'}),
+         Package('dev-util/cppcheck', keywords={'dev'}),
+         Package('dev-util/difftastic', keywords={'dev'}),
+         Package('dev-debug/gef', keywords={'dev'}),
+         Package('dev-util/radare2', keywords={'dev'}),
+         Package('dev-util/rr', keywords={'dev'}),
+         Package('media-gfx/graphviz', keywords={'dev'}),
+         Package('app-misc/hivex', use_flags='perl'),
+         Package('media-gfx/openscad', use_flags='gui'),
+         ]),
+
+
     # optional packages
 
     IfKeyword('minimal',
@@ -360,5 +362,12 @@ PACKAGES = [
          Package('app-emulation/libvirt',
                  use_flags='libssh lvm parted qemu libvirtd'),
          Package('app-admin/conky',
-                 use_flags='intel-backlight iostats portmon imlib rss')]),
+                 use_flags='intel-backlight iostats portmon imlib rss'),
+         Package('dev-dotnet/dotnet-sdk',
+                 binary_alternative='dev-dotnet/dotnet-sdk-bin',
+                 keywords={'dev'}),
+         Package('dev-util/android-tools',
+                 extra_use_flags='python',
+                 keywords={'dev'}),
+         ]),
 ]
