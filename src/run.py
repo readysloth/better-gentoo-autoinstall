@@ -25,6 +25,9 @@ def parse_args(args):
     install_parser.add_argument('-B', '--barebones',
                                 action='store_true',
                                 help='make installation less than mimimal')
+    install_parser.add_argument('-g', '--generic',
+                                action='store_true',
+                                help='tune for generic processor')
     return parser.parse_args()
 
 
@@ -36,6 +39,8 @@ def main(args):
     if args.barebones:
         os.environ['minimal'] = 'True'
         os.environ['barebones'] = 'True'
+    if args.generic:
+        os.environ['generic'] = 'True'
 
     import install
 
