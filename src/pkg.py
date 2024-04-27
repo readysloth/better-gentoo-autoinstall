@@ -67,7 +67,11 @@ PORTAGE_SETUP = [
     ShellCmd('rc-service ntp-client start', critical=True),
     Package('app-portage/cpuid2cpuflags',
             critical=True),
-    ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
+    IfNotKeyword(
+        'generic',
+        ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
+        None
+    ),
     ShellCmd('mkdir -p /etc/portage/env'),
     ShellCmd('mkdir -p /etc/portage/profile'),
     Package('app-portage/mirrorselect',
