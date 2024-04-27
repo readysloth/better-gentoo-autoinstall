@@ -150,6 +150,7 @@ PACKAGES = [
     Package('app-emulation/winetricks'),
     Package('app-eselect/eselect-repository'),
     Package('app-misc/jq'),
+    Package('app-misc/rlwrap'),
     Package('app-misc/tmux'),
     Package('app-misc/yq'),
     Package('app-shells/dash'),
