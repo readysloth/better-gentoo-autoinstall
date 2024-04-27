@@ -154,11 +154,12 @@ def install(disk_node: str, pretend: bool = False):
     for cmd in pkg.PORTAGE_SETUP:
         chroot_cmds.append(cmd(pretend=pretend))
 
-    gcc_march_proc = GCC_MARCH(stdout=sp.PIPE, pretend=pretend)
     march_flags = '-march=native'
     if 'generic' in os.environ:
         march_flags = '-march=x86-64 -mtune=generic'
     if not pretend and 'generic' not in os.environ:
+        gcc_march_proc = GCC_MARCH(stdout=sp.PIPE, pretend=pretend)
+        gcc_march_proc.wait()
         march_flags = gcc_march_proc.stdout.read().decode().strip()
         add_value_to_variable(make_conf_path, 'COMMON_FLAGS', march_flags)
 
