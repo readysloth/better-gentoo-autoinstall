@@ -55,6 +55,8 @@ def process_keywords(cmds: List[Cmd], pretend: bool = False):
             continue
         elif type(cmd) in [IfKeyword, IfNotKeyword]:
             cmd = cmd.exec
+        if cmd is None:
+            continue
         for keyword in cmd.keywords:
             if keyword in HANDLER_MAP:
                 HANDLER_MAP[keyword](cmd)
