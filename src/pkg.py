@@ -62,7 +62,8 @@ PORTAGE_SETUP = [
     TMPFS,
     Package('app-portage/gentoolkit',
             critical=True),
-    ShellCmd('eselect profile set --force 6'),
+    # [21]  default/linux/amd64/23.0 (stable)
+    ShellCmd('eselect profile set --force 21'),
     Package('net-misc/ntp', critical=True),
     ShellCmd('rc-service ntp-client start', critical=True),
     Package('app-portage/cpuid2cpuflags',
