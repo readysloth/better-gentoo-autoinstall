@@ -202,6 +202,7 @@ PACKAGES = [
     Package('sys-process/cronie'),
     Package('sys-process/htop'),
     Package('sys-process/procenv'),
+    Package('virtual/ssh'),
     Package('x11-apps/setxkbmap'),
     Package('x11-apps/xdpyinfo'),
     Package('x11-apps/xev'),
