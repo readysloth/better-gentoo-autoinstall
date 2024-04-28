@@ -28,7 +28,9 @@ DISK_PREPARE = [
              ignore_change=True,
              name='vgremove',
              desc='removal of existing LVM groups'),
-] + [
+]
+
+DISK_PART = [
     ShellCmd(f'parted -a optimal --script %placeholder% "{script}"',
              critical=True,
              name='parted',
@@ -86,6 +88,15 @@ def prepare_disk(disk_node: str, pretend: bool = False):
         cmd.insert(disk_node)
         executed_procs.append(cmd(pretend=pretend))
     return executed_procs, DISK_PREPARE
+
+
+def part_disk(disk_node: str, pretend: bool = False):
+    executed_procs = []
+
+    for cmd in DISK_PART:
+        cmd.insert(disk_node)
+        executed_procs.append(cmd(pretend=pretend))
+    return executed_procs, DISK_PART
 
 
 def create_lvm(part_node: str, pretend: bool = False):

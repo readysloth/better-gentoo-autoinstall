@@ -28,6 +28,10 @@ def parse_args(args):
     install_parser.add_argument('-g', '--generic',
                                 action='store_true',
                                 help='tune for generic processor')
+    install_parser.add_argument('-D', '--no-disk-prepare',
+                                action='store_true',
+                                help='do not prepare disk for install. '
+                                     'Useful if you are installing OS to a file')
     return parser.parse_args()
 
 
@@ -41,6 +45,8 @@ def main(args):
         os.environ['barebones'] = 'True'
     if args.generic:
         os.environ['generic'] = 'True'
+    if args.no_disk_prepare:
+        os.environ['no_disk_prepare'] = 'True'
 
     import install
 

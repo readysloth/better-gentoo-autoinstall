@@ -81,7 +81,9 @@ def get_part(disk_node: str, number: int, pretend: bool = False) -> str:
 
 def disk_stage(disk_node: str, pretend: bool = False):
     executed_cmds = []
-    executed_cmds.append(disk.prepare_disk(disk_node, pretend=pretend))
+    if 'no_disk_prepare' not in os.environ:
+        executed_cmds.append(disk.prepare_disk(disk_node, pretend=pretend))
+    executed_cmds.append(disk.part_disk(disk_node, pretend=pretend))
 
     boot_part = get_part(disk_node, 1, pretend=pretend)
     lvm_part = get_part(disk_node, 2, pretend=pretend)
