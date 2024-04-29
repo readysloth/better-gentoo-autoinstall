@@ -239,6 +239,9 @@ def install(disk_node: str, pretend: bool = False):
             else:
                 break
 
+    for cmd in pkg.NON_PORTAGE_PACKAGES:
+        chroot_cmds.append(cmd(pretend=pretend))
+
     for cmd in POST_INSTALL:
         chroot_cmds.append(cmd(pretend=pretend))
 
@@ -248,6 +251,7 @@ def install(disk_node: str, pretend: bool = False):
     commands_decl += pkg.BLOCKING_PACKAGES
     commands_decl += pkg.PACKAGES
     commands_decl += world_install
+    commands_decl += pkg.NON_PORTAGE_PACKAGES
     commands_decl += POST_INSTALL
     executed_cmds.append([chroot_cmds, commands_decl])
 

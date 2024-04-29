@@ -298,11 +298,6 @@ PACKAGES = [
     # other packages
     Package('net-im/telegram-desktop',
             binary_alternative='net-im/telegram-desktop-bin'),
-    ShellCmd('git clone --depth=1 https://github.com/rvaiya/warpd.git'
-             ' && cd warpd; DISABLE_WAYLAND=1 make && make install; cd -'
-             ' && rm -rf warpd',
-             name='warpd installation'),
-
     Package('x11-terms/st',
             use_flags='savedconfig',
             hooks=[st_patches]),
@@ -377,4 +372,11 @@ PACKAGES = [
                  extra_use_flags='python',
                  keywords={'dev'}),
          ]),
+]
+
+NON_PORTAGE_PACKAGES = [
+    ShellCmd('git clone --depth=1 https://github.com/rvaiya/warpd.git'
+             ' && cd warpd; DISABLE_WAYLAND=1 make && make install; cd -'
+             ' && rm -rf warpd',
+             name='warpd installation'),
 ]
