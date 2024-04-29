@@ -279,7 +279,8 @@ PACKAGES = [
                        'netapi', 'samba', 'mingw']),
     Package('media-gfx/imagemagick',
             use_flags=['djvu', 'lzma', 'postscript',
-                       'raw', 'svg', 'webp']),
+                       'raw', 'svg', 'webp',
+                       'xml']),
 
     Package('www-client/links',
             use_flags=['freetype', 'libevent', 'ipv6',
