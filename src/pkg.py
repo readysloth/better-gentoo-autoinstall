@@ -34,7 +34,8 @@ GLOBAL_USE_FLAGS = [
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
     'tbb',
-    '-wayland', '-gnome', '-gnome-online-accounts', '-eds'
+    '-wayland', '-gnome', '-gnome-online-accounts',
+    '-eds', '-systemd'
 ]
 
 MASKED = [
