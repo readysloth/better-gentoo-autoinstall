@@ -25,9 +25,6 @@ mkdir -p ${USER_HOME}/Images
 cp -r "${WALLPAPERS}/backgrounds" ${USER_HOME}/Images
 
 
-# vim plugin manager
-curl -fLo ${USER_HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
 # scripts
 mkdir -p ${USER_HOME}/.scripts
 cat << EOF > ${USER_HOME}/.scripts/autochanging_wallpaper.sh
@@ -192,6 +189,12 @@ EndSection
 EOF
 
 # Vim
+
+if [ "$minimal" != "True" ]
+then
+# vim plugin manager
+curl -fLo ${USER_HOME}/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
 cat << EOF > ${USER_HOME}/.vimrc
 set number
 set relativenumber
@@ -329,6 +332,7 @@ pushd xkb-switch;
 popd
 rm -rf xkb-switch
 
+fi # Vim install
 
 # tmux
 git clone https://github.com/tmux-plugins/tpm /etc/tmux/plugins/tpm
@@ -499,6 +503,8 @@ EOF
 
 
 # conky
+if [ "$minimal" != "True" ]
+then
 mkdir -p ${USER_HOME}/.config/conky
 cat << "EOF" > ${USER_HOME}/.config/conky/conky.conf
 conky.config = {
@@ -605,6 +611,7 @@ conky.text = string.gsub(conky.text,
                          "!delete_big_numbers",
                          "sed 's/[[:digit:]]\\{3,\\}/.../g' | sed 's/\\.\\+/.../g'")
 EOF
+fi # conky
 
 
 cat << EOF > /etc/doas.conf
@@ -620,6 +627,8 @@ cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 
 chown -R ${USERNAME}:${USERNAME} ${USER_HOME}
 
+if [ "$minimal" != "True" ]
+then
 doas -u ${USERNAME} vim +PlugInstall +qa
 VIM_LSP_SETTINGS_SERVERS="${USER_HOME}/.local/share/vim-lsp-settings/servers"
 VIM_LSP_SETTINGS_ROOT="${USER_HOME}/.vim/plugged/vim-lsp-settings/installer"
@@ -644,6 +653,7 @@ cd ${VIM_LSP_SETTINGS_SERVERS}
             sh ${VIM_LSP_SETTINGS_ROOT}/install-$s.sh
         cd -
     done
+fi # PlugInstall
 
 doas -u ${USERNAME} fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher'
 doas -u ${USERNAME} fish -c 'fisher install jethrokuan/z'
@@ -671,6 +681,30 @@ cd /tmp/rofi;
     fc-cache -v;
 "
 
+#cleanup
+rm -rf /__pycache__
+
+# backup install
+mkdir -p /backup/install
+fsarchiver savefs \
+  --allow-rw-mounted \
+  --jobs="$(nproc)" \
+  --zstd=22 \
+  /backup/install/boot-part.fsa \
+  "$BOOT_PARTITION"
+
+fsarchiver savefs \
+  --allow-rw-mounted \
+  --jobs="$(nproc)" \
+  --zstd=22 \
+  --exclude=/var/log/ \
+  --exclude=/var/lock/  \
+  --exclude=/tmp \
+  --exclude=/*.py \
+  --exclude=/*.sh \
+  --exclude=/*.std* \
+  /backup/install/root-part.fsa \
+  "$LVM_DEVICE"
 
 # to be extra-sure
 chown -R ${USERNAME}:${USERNAME} ${USER_HOME}
