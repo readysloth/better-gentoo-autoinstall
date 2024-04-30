@@ -35,7 +35,7 @@ GLOBAL_USE_FLAGS = [
     'screencast', 'io-uring', 'xattr',
     'tbb',
     '-wayland', '-gnome', '-gnome-online-accounts',
-    '-eds', '-systemd'
+    '-eds', '-systemd', '-llvm'
 ]
 
 MASKED = [
