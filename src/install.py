@@ -88,6 +88,10 @@ def disk_stage(disk_node: str, pretend: bool = False):
     boot_part = get_part(disk_node, 1, pretend=pretend)
     lvm_part = get_part(disk_node, 2, pretend=pretend)
 
+    os.environ['BOOT_PARTITION'] = boot_part
+    os.environ['LVM_PARTITION'] = lvm_part
+    os.environ['LVM_DEVICE'] = f'/dev/{disk.LVM_GROUP}/rootfs'
+
     executed_cmds.append(disk.create_lvm(lvm_part, pretend=pretend))
     executed_cmds.append(disk.mkfs(boot_part, pretend=pretend))
     executed_cmds.append(disk.mount(pretend=pretend))
