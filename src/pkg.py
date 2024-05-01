@@ -225,7 +225,6 @@ PACKAGES = [
     Package('app-arch/zip', use_flags='natspec'),
     Package('media-libs/libpng', use_flags='apng'),
     Package('media-libs/libpulse', use_flags='glib'),
-    Package('media-libs/mesa', use_flags='d3d9 lm-sensors vdpau'),
     Package('media-sound/alsa-utils', use_flags='bat ncurses'),
     Package('net-print/hplip', use_flags='hpcups'),
     Package('net-wireless/wpa_supplicant', use_flags='ap'),
@@ -297,6 +296,11 @@ PACKAGES = [
             binary_alternative='app-office/libreoffice-bin',
             use_flags='pdfimport',
             keywords={'ram-hog'}),
+    Package('media-libs/mesa',
+            use_flags=['d3d9', 'lm-sensors', 'vdpau',
+                       '-video_cards_radeon',
+                       '-video_cards_radeonsi',
+                       '-video_cards_nouveau']),
 
     # other packages
     Package('net-im/telegram-desktop',
