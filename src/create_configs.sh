@@ -681,6 +681,32 @@ cd /tmp/rofi;
     fc-cache -v;
 "
 
+mkdir -p "${USER_HOME}/useful-configs/firefox/plugins"
+
+curl https://raw.githubusercontent.com/yokoffing/Betterfox/main/user.js | \
+  tr -d '\r' > "${USER_HOME}/useful-configs/firefox/user.js"
+
+for path_to_addon in \
+  4248205/libredirect-2.8.2.xpi \
+  4264034/localcdn_fork_of_decentraleyes-2.6.66.xpi \
+  3710409/faster_pageload-1.8.5.xpi \
+  4216095/istilldontcareaboutcookies-1.1.4.xpi \
+  4064884/clearurls-1.26.1.xpi \
+  4132891/dont_track_me_google1-4.28.xpi \
+  4206186/noscript-11.4.29.xpi \
+  4269236/flagfox-6.1.74.xpi \
+  3059971/image_search_options-3.0.12.xpi \
+  4175239/onetab-1.83.xpi \
+  4261837/hover_zoom_plus-1.0.215.1.xpi
+do
+  wget --directory-prefix="${USER_HOME}/useful-configs/firefox/plugins" \
+    https://addons.mozilla.org/firefox/downloads/file/$path_to_addon
+done
+
+# adblock
+wget --directory-prefix="${USER_HOME}/useful-configs/firefox/plugins" \
+  https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts
+
 #cleanup
 rm -rf /__pycache__
 
