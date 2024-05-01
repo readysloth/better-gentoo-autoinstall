@@ -209,6 +209,7 @@ PACKAGES = [
     Package('x11-apps/xev'),
     Package('x11-apps/xkill'),
     Package('x11-apps/xrandr'),
+    Package('x11-misc/redshift'),
     Package('x11-misc/rofi'),
     Package('x11-misc/sxhkd'),
     Package('x11-misc/xclip'),
