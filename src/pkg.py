@@ -33,7 +33,7 @@ GLOBAL_USE_FLAGS = [
     'device-mapper', 'gtk', 'vulkan', 'sdl',
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
-    'tbb',
+    'tbb', 'lvm',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
 ]
@@ -369,7 +369,7 @@ PACKAGES = [
          #         keywords={'ram-hog'}),
 
          Package('app-emulation/libvirt',
-                 use_flags='libssh lvm parted qemu libvirtd'),
+                 use_flags='libssh parted qemu libvirtd'),
          Package('app-admin/conky',
                  use_flags='intel-backlight iostats portmon imlib rss'),
          Package('dev-dotnet/dotnet-sdk',
