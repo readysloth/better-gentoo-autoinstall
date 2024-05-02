@@ -65,8 +65,9 @@ def add_variable_to_file(filename: Union[str, Path],
                          variable_name: str,
                          value: str,
                          quot: str = '"',
+                         assignment: str = '=',
                          pretend: bool = False):
     if pretend:
-        return ShellCmd(f'''echo '{variable_name}={quot}{value}{quot}' >> {filename}''')
+        return ShellCmd(f'''echo '{variable_name}{assignment}{quot}{value}{quot}' >> {filename}''')
     with open(filename, 'a') as file:
-        file.write(f'{variable_name}={quot}{value}{quot}\n')
+        file.write(f'{variable_name}{assignment}{quot}{value}{quot}\n')

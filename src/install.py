@@ -32,6 +32,10 @@ GCC_MARCH = ShellCmd('resolve-march-native')
 MOUNT_BOOT = ShellCmd('mount %placeholder% /mnt/gentoo/boot',
                       name='boot mount')
 
+PRE_INSTALL = [
+    ShellCmd('mkdir /etc/dracut.conf.d'),
+]
+
 USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
 
 POST_INSTALL = [
@@ -118,9 +122,22 @@ def install(disk_node: str, pretend: bool = False):
         chroot_prepare.append(cmd(pretend=True))
     executed_cmds.append([chroot_prepare, CHROOT_SCRIPT_PRETEND])
 
+    pre_install_cmds = []
+    for cmd in PRE_INSTALL:
+        pre_install_cmds.append(cmd(pretend=pretend))
+    executed_cmds.append([pre_install_cmds, PRE_INSTALL])
+
+    dracut_lvm_conf_path = '/etc/dracut.conf.d/lvm.conf'
     make_conf_path = '/etc/portage/make.conf'
     conf_jobs = []
     conf_jobs_executed = []
+
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, dracut_lvm_conf_path, 'add_dracut_modules', ' lvm ', assignment='+=')
+    )
+    conf_jobs.append(
+        ft.partial(add_variable_to_file, dracut_lvm_conf_path, 'lvmconf', 'yes')
+    )
 
     parallel_jobs = 4
     conf_jobs.append(
@@ -195,6 +212,9 @@ def install(disk_node: str, pretend: bool = False):
         cmd_obj = cmd(pretend=pretend)
         chroot_cmds.append(cmd_obj)
         conf_jobs_executed.append(cmd_obj)
+
+    for cmd in PRE_INSTALL:
+        chroot_cmds.append(cmd(pretend=pretend))
 
     all_packages = pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES
     keywords.process_keywords(all_packages, pretend=pretend)
