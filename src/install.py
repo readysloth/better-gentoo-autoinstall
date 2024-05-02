@@ -57,8 +57,8 @@ POST_INSTALL = [
              name='grub config'),
     ShellCmd('chmod +x /etc/local.d/*.start',
              name='local.d services'),
-    ShellCmd('rc-update add lvmetad boot',
-             name='lvmetad'),
+    ShellCmd('rc-update add lvm boot',
+             name='lvm'),
 ] + [
     ShellCmd(f'rc-update add {s} default',
              name=f'service {s}',
