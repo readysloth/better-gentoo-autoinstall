@@ -4,8 +4,15 @@ USERNAME="$1"
 USER_HOME=$(eval echo ~"$USERNAME")
 
 WALLPAPERS="$(mktemp -d)"
-git clone https://github.com/elementary/wallpapers.git "$WALLPAPERS"
+git clone --depth=1 https://github.com/dharmx/walls.git "$WALLPAPERS"
+mkdir "$WALLPAPERS/backgrounds"
 
+for wallpaper_type in wave cherry paper interior
+do
+  cp "$WALLPAPERS/$wallpaper_type"/* "$WALLPAPERS/backgrounds"
+done
+
+rm "$WALLPAPERS/backgrounds"/*.md
 
 cat << EOF > /etc/local.d/50-zswap.start
 echo lz4 > /sys/module/zswap/parameters/compressor
