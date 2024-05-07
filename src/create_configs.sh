@@ -34,25 +34,60 @@ cp -r "${WALLPAPERS}/backgrounds" ${USER_HOME}/Images
 
 # scripts
 mkdir -p ${USER_HOME}/.scripts
-cat << EOF > ${USER_HOME}/.scripts/autochanging_wallpaper.sh
+cat << "EOF" > ${USER_HOME}/.scripts/conky_wallpaper.sh
 #!/usr/bin/env bash
 
-BACKGROUND_DIR='${USER_HOME}/Images/backgrounds'
-while true
-do
-  background="\$BACKGROUND_DIR/\$(ls "\$BACKGROUND_DIR" | shuf | head -n1)"
-  echo "\$background" > /tmp/background.image
-  convert "\$background" -scale 500x500! \
-                        -format %c \
-                        +dither \
-                        -brightness-contrast 40 \
-                        -colors 50 \
-                        -unique-colors txt:- \
-    | grep 'srgb(' \
-    | awk '{print \$3}' >> /tmp/background.image
-  feh --bg-fill "\$background"
-  sleep 1h
-done
+IMAGE="$1"
+POSITION="360,50"
+IMAGE_WIDTH=$(identify -format "%w\n" "$IMAGE")
+IMAGE_HEIGHT=$(identify -format "%h\n" "$IMAGE")
+
+TARGET_WIDTH=1920
+TARGET_HEIGHT=1080
+SCALE_PERCENT=100
+WIDTH_PERCENT="$SCALE_PERCENT"
+HEIGHT_PERCENT="$SCALE_PERCENT"
+
+if [ $IMAGE_WIDTH -gt $TARGET_WIDTH ]
+then
+  WIDTH_PERCENT=$(printf "%0.f" "$(bc <<< "scale=3; ($TARGET_WIDTH / $IMAGE_WIDTH) * 100")")
+fi
+
+if [ $IMAGE_HEIGHT -gt $TARGET_HEIGHT ]
+then
+  HEIGHT_PERCENT=$(printf "%0.f" "$(bc <<< "scale=3; ($TARGET_HEIGHT / $IMAGE_HEIGHT) * 100")")
+fi
+
+SCALE_PERCENT=$((WIDTH_PERCENT > HEIGHT_PERCENT ? HEIGHT_PERCENT : WIDTH_PERCENT))
+
+IMAGE_WIDTH=$(printf "%0.f" "$(bc <<< "$IMAGE_WIDTH * $SCALE_PERCENT / 100")")
+IMAGE_HEIGHT=$(printf "%0.f" "$(bc <<< "$IMAGE_HEIGHT * $SCALE_PERCENT / 100")")
+
+echo "\${image $IMAGE -p $POSITION, -s ${IMAGE_WIDTH}x${IMAGE_HEIGHT}}"
+EOF
+
+
+cat << "EOF" > ${USER_HOME}/.scripts/random_conky_wallpaper.sh
+#!/usr/bin/env bash
+
+LAST_CHANGE_TIME="$(stat --format=%Y "$0")"
+CURRENT_TIME="$(date +%s)"
+
+# To discard seconds
+CURRENT_TIME="$((CURRENT_TIME / (30 * 60)))"
+CURRENT_TIME="$((CURRENT_TIME * (30 * 60)))"
+
+WALLPAPER_DURATION="$((LAST_CHANGE_TIME - CURRENT_TIME))"
+
+if [ -n "$WALLPAPER_DURATION" ] && [ "$WALLPAPER_DURATION" -gt $(( 30 * 60 )) ]
+then
+  touch "$0"
+fi
+
+WALLPAPER_COUNT="$(find ~/Images/backgrounds/ -type f | wc -l)"
+IMAGE_INDEX=$((CURRENT_TIME % (WALLPAPER_COUNT-1)))
+
+conky_wallpaper.sh "$(find ~/Images/backgrounds/ -type f | sort | sed -n "${IMAGE_INDEX}p")"
 EOF
 
 
@@ -64,20 +99,6 @@ pushd $TEMP_DIR
     scrot
     xclip -i -selection clipboard -t image/png *.png
 popd
-EOF
-
-
-cat << "EOF" > ${USER_HOME}/.scripts/get_bg_color.sh
-#!/usr/bin/env bash
-
-BACKGROUND_INFO=/tmp/background.image
-LINE_COUNT=$(wc -l "$BACKGROUND_INFO" | awk '{print $1}')
-POSITION="$1"
-
-[ "$1" == 'last' ] && POSITION='$'
-[ "$1" == 'middle' ] && POSITION="$(($LINE_COUNT / 2))"
-
-sed -e 1d -e 's/#//g' "$BACKGROUND_INFO" | sed -n "${POSITION}p"
 EOF
 
 
@@ -98,9 +119,9 @@ done | sed '1i\ IP PROCESS COUNTRY' | column -t | tr - ' '
 EOF
 
 
-chmod +x ${USER_HOME}/.scripts/autochanging_wallpaper.sh
+chmod +x ${USER_HOME}/.scripts/conky_wallpaper.sh
+chmod +x ${USER_HOME}/.scripts/random_conky_wallpaper.sh
 chmod +x ${USER_HOME}/.scripts/make_screenshot.sh
-chmod +x ${USER_HOME}/.scripts/get_bg_color.sh
 chmod +x ${USER_HOME}/.scripts/connected_to.sh
 
 
@@ -128,7 +149,6 @@ conky
 warpd
 setxkbmap -option grp:alt_shift_toggle "us(dvorak),ru"
 ${USER_HOME}/.config/polybar/launch.sh --forest &
-${USER_HOME}/.scripts/autochanging_wallpaper.sh &
 exec bspwm
 EOF
 
@@ -515,11 +535,11 @@ then
 mkdir -p ${USER_HOME}/.config/conky
 cat << "EOF" > ${USER_HOME}/.config/conky/conky.conf
 conky.config = {
-    alignment = 'top_right',
-    background = true,
+    alignment = 'top_left',
+    background = false,
     border_width = 1,
     cpu_avg_samples = 2,
-    default_color = 'green',
+    default_color = 'white',
     default_outline_color = 'white',
     default_shade_color = 'white',
     double_buffer = true,
@@ -528,12 +548,11 @@ conky.config = {
     draw_outline = false,
     draw_shades = false,
     extra_newline = false,
-    font = 'Liberation Mono:pixelsize=15',
-    gap_x = 10,
-    gap_y = 50,
-    minimum_height = 5,
-    minimum_width = 5,
-    maximum_width = 700,
+    font = 'DejaVu Sans Mono:size=12',
+    gap_x = 0,
+    gap_y = 38,
+    minimum_height = 1050,
+    minimum_width = 1980,
     net_avg_samples = 2,
     no_buffers = true,
     out_to_console = false,
@@ -543,80 +562,48 @@ conky.config = {
     own_window = true,
     own_window_class = 'Conky',
     own_window_type = 'desktop',
-    own_window_transparent = false,
-    own_window_argb_visual = true,
-    own_window_argb_value = 130,
     show_graph_range = false,
     show_graph_scale = false,
     stippled_borders = 0,
-    update_interval = 2.0,
+    update_interval = 10.0,
     uppercase = false,
     use_spacer = 'none',
     use_xft = true,
 }
 
 conky.text = [[
-!title_color ${scroll 100 $sysname $nodename $kernel $machine}
-!hr_color $hr
-!title_color Uptime:!info_color $uptime
-!title_color Battery:!info_color $battery
-!title_color CPU Usage:!info_color $cpu% ${cpubar 4}
-!title_color Frequency (in GHz):!info_color $freq_g
-!title_color Cpu Graph:
-${cpugraph cpu1 50,150 !info_color FF0000 -t} \
-${cpugraph cpu2 50,150 !info_color FF0000 -t} \
-${cpugraph cpu3 50,150 !info_color FF0000 -t} \
-${cpugraph cpu4 50,150 !info_color FF0000 -t}
-${cpugraph cpu5 50,150 !info_color FF0000 -t} \
-${cpugraph cpu6 50,150 !info_color FF0000 -t} \
-${cpugraph cpu7 50,150 !info_color FF0000 -t} \
-${cpugraph cpu8 50,150 !info_color FF0000 -t}
-!title_color RAM Usage:!info_color $mem/$memmax - $memperc% ${membar 4}
-!title_color RAM Graph:
-${memgraph 70,635 !title_color,$info_color}
-!title_color Swap Usage:!info_color $swap/$swapmax - $swapperc% ${swapbar 4}
-!title_color Processes:!info_color $processes  !title_color Running:!info_color $running_processes
-!hr_color $hr
-!title_color Name              PID     CPU%   MEM%
-!info_color ${top name 1} ${top pid 1} ${top cpu 1} ${top mem 1}
-!info_color ${top name 2} ${top pid 2} ${top cpu 2} ${top mem 2}
-!title_color Syslog
-!info_color\
-${font 'Liberation Mono:pixelsize=13'}${execp tail -n5 /var/log/syslog | !limit_output}
-$font\
-!hr_color $hr
-!title_color File systems:
- / !info_color ${fs_used /}/${fs_size /} ${fs_bar 6 /}
-!hr_color $hr
-!title_color Networking (${addr wlan0}):
-!title_color Public IP:
-!title_color - Current!info_color ${curl https://icanhazip.com/ 30}\
-!title_color - Previous!info_color ${curl https://icanhazip.com/ 60}\
-!title_color Up:!info_color ${upspeed} !title_color Down:!info_color ${downspeed}
-!title_color Connected to:
-!info_color\
-${execpi 600 connected_to.sh}
+${scroll 100 $sysname $nodename $kernel $machine}
+$hr
+${color grey}Uptime:$color $uptime
+${color grey}Frequency (in MHz):$color $freq
+${color grey}Frequency (in GHz):$color $freq_g
+${color grey}RAM Usage:$color $mem/$memmax - $memperc%
+${color grey}Swap Usage:$color $swap/$swapmax - $swapperc%
+${color grey}CPU Usage:$color $cpu%
+${color grey}Processes:$color $processes  ${color grey}Running:$color $running_processes
+${color grey}File systems:
+ / $color${fs_used /}/${fs_size /}
+${color grey}Networking:
+Up:$color ${upspeed} ${color grey} - Down:$color ${downspeed}
+${color grey}Networking (${addr wlan0}):
+${color grey}Public IP:
+${color grey}- Current ${color white}${curl https://icanhazip.com/ 30}\
+${color grey}- Previous ${color white}${curl https://icanhazip.com/ 60}\
+
+${color grey}Name              PID    CPU%  MEM%
+${color lightgrey}${top name 1}${top pid 1}${top cpu 1}${top mem 1}
+${color lightgrey}${top name 2}${top pid 2}${top cpu 2}${top mem 2}
+${color lightgrey}${top name 3}${top pid 3}${top cpu 3}${top mem 3}
+${color lightgrey}${top name 4}${top pid 4}${top cpu 4}${top mem 4}
+${color lightgrey}${top name 5}${top pid 5}${top cpu 5}${top mem 5}
+${color lightgrey}${top name 6}${top pid 6}${top cpu 6}${top mem 6}
+${color lightgrey}${top name 7}${top pid 7}${top cpu 7}${top mem 7}
+${color lightgrey}${top name 8}${top pid 8}${top cpu 8}${top mem 8}
+${color lightgrey}${top name 9}${top pid 9}${top cpu 9}${top mem 9}
+${color lightgrey}${top name 10}${top pid 10}${top cpu 10}${top mem 10}
+
+${eval ${exec random_conky_wallpaper.sh}}
 ]]
-conky.text = string.gsub(conky.text,
-                         "!title_color",
-                         "${eval $${color ${exec get_bg_color.sh middle}}}")
-conky.text = string.gsub(conky.text,
-                         "!hr_color",
-                         "${eval $${color ${exec get_bg_color.sh 5}}}")
-conky.text = string.gsub(conky.text,
-                         "!info_color",
-                         "${eval $${color ${exec get_bg_color.sh last}}}")
-conky.text = string.gsub(conky.text,
-                         "!hot_color",
-                         "${eval $${color ${exec get_bg_color.sh 1 | sed 's/^../FF/'}}}")
-
-conky.text = string.gsub(conky.text,
-                         "!limit_output",
-                         "sed -e 's/gentoo//' -e 's/\\[\\.\\{3\\}\\]//g' | tr -s ' ' | cut -c16-110 | sed 's/.*/ &.../g' ")
-
-conky.text = string.gsub(conky.text,
-                         "!delete_big_numbers",
-                         "sed 's/[[:digit:]]\\{3,\\}/.../g' | sed 's/\\.\\+/.../g'")
 EOF
 fi # conky
 
