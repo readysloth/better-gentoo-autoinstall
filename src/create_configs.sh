@@ -85,7 +85,7 @@ then
 fi
 
 WALLPAPER_COUNT="$(find ~/Images/backgrounds/ -type f | wc -l)"
-IMAGE_INDEX=$((CURRENT_TIME % (WALLPAPER_COUNT-1)))
+IMAGE_INDEX=$((CURRENT_TIME % WALLPAPER_COUNT + 1))
 
 conky_wallpaper.sh "$(find ~/Images/backgrounds/ -type f | sort | sed -n "${IMAGE_INDEX}p")"
 EOF
