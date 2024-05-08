@@ -591,16 +591,16 @@ ${color grey}- Current ${color white}${curl https://icanhazip.com/ 30}\
 ${color grey}- Previous ${color white}${curl https://icanhazip.com/ 60}\
 
 ${color grey}Name              PID    CPU%  MEM%
-${color lightgrey}${top name 1}${top pid 1}${top cpu 1}${top mem 1}
-${color lightgrey}${top name 2}${top pid 2}${top cpu 2}${top mem 2}
-${color lightgrey}${top name 3}${top pid 3}${top cpu 3}${top mem 3}
-${color lightgrey}${top name 4}${top pid 4}${top cpu 4}${top mem 4}
-${color lightgrey}${top name 5}${top pid 5}${top cpu 5}${top mem 5}
-${color lightgrey}${top name 6}${top pid 6}${top cpu 6}${top mem 6}
-${color lightgrey}${top name 7}${top pid 7}${top cpu 7}${top mem 7}
-${color lightgrey}${top name 8}${top pid 8}${top cpu 8}${top mem 8}
-${color lightgrey}${top name 9}${top pid 9}${top cpu 9}${top mem 9}
-${color lightgrey}${top name 10}${top pid 10}${top cpu 10}${top mem 10}
+${color yellow}${top name 1}${top pid 1}${top cpu 1}${top mem 1}
+${color white}${top name 2}${top pid 2}${top cpu 2}${top mem 2}
+${color white}${top name 3}${top pid 3}${top cpu 3}${top mem 3}
+${color white}${top name 4}${top pid 4}${top cpu 4}${top mem 4}
+${color white}${top name 5}${top pid 5}${top cpu 5}${top mem 5}
+${color white}${top name 6}${top pid 6}${top cpu 6}${top mem 6}
+${color white}${top name 7}${top pid 7}${top cpu 7}${top mem 7}
+${color white}${top name 8}${top pid 8}${top cpu 8}${top mem 8}
+${color white}${top name 9}${top pid 9}${top cpu 9}${top mem 9}
+${color white}${top name 10}${top pid 10}${top cpu 10}${top mem 10}
 
 ${eval ${exec random_conky_wallpaper.sh}}
 ]]
