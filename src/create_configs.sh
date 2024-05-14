@@ -681,7 +681,6 @@ curl https://raw.githubusercontent.com/yokoffing/Betterfox/main/user.js | \
   tr -d '\r' > "${USER_HOME}/useful-configs/firefox/user.js"
 
 for path_to_addon in \
-  4169076/librejs-7.21.1.xpi \
   3880193/view_image_info_reborn-2.1.1.xpi \
   3920533/skip_redirect-2.3.6.xpi \
   4262820/canvasblocker-1.10.1.xpi \
