@@ -66,7 +66,7 @@ DISK_FS_CREATION_OPS = [
              ignore_change=True,
              name='mkfs.ext4',
              desc='rootfs creation'),
-    ShellCmd(f'tune2fs -O dir_index,extent /dev/{LVM_GROUP}/rootfs',
+    ShellCmd(f'tune2fs -O dir_index,extent,fast_commit /dev/{LVM_GROUP}/rootfs',
              critical=False,
              ignore_change=True,
              name='tune2fs',
