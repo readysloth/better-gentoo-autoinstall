@@ -302,6 +302,12 @@ PACKAGES = [
                        '-video_cards_radeon',
                        '-video_cards_radeonsi',
                        '-video_cards_nouveau']),
+    Package('net-proxy/privoxy',
+            use_flags=['compression',
+                       'fast-redirects',
+                       'whitelists',
+                       'image-blocking',
+                       'extended-statistics']),
 
     # other packages
     Package('net-im/telegram-desktop',
@@ -347,11 +353,6 @@ PACKAGES = [
          Package('media-gfx/gimp', use_flags='webp lua'),
          Package('dev-debug/valgrind', keywords={'dev'}),
          Package('app-forensics/aflplusplus', keywords={'dev'}),
-         Package('net-proxy/privoxy',
-                 use_flags=['compression',
-                            'fast-redirects',
-                            'whitelists',
-                            'extended-statistics']),
          # uncomment if you are either brave or desperate enough
          # Package('media-gfx/freecad',
          #         use_flags=['addonmgr', 'designer', 'fem',
