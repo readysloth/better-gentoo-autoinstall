@@ -228,6 +228,7 @@ PACKAGES = [
     Package('media-libs/libpulse', use_flags='glib'),
     Package('media-sound/alsa-utils', use_flags='bat ncurses'),
     Package('net-print/hplip', use_flags='hpcups'),
+    Package('net-proxy/squid', use_flags='ssl-crtd'),
     Package('net-wireless/wpa_supplicant', use_flags='ap'),
     Package('sys-apps/util-linux', use_flags='-logger'),
     Package('sys-boot/grub', use_flags='mount'),
