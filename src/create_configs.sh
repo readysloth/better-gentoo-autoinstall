@@ -320,6 +320,31 @@ Section "InputClass"
 EndSection
 EOF
 
+# privoxy
+
+mkdir -p /etc/privoxy
+cat << EOF >> /etc/privoxy/config
+temporary-directory /tmp
+handle-as-empty-doc-returns-ok 1
+EOF
+
+# squid
+
+mkdir -p /etc/squid
+cat << EOF >> /etc/squid/squid.conf
+# Forward request to Privoxy
+cache_peer 127.0.0.1 parent 8118 7 no-query default no-digest no-netdb-exchange
+# ACL for FTP
+acl ftp proto FTP
+# No FTP through Privoxy
+always_direct allow ftp
+# Immediate restart
+shutdown_lifetime 0 seconds
+httpd_suppress_version_string on
+forwarded_for off
+never_direct allow all
+EOF
+
 # Vim
 
 if [ "$minimal" != "True" ]
