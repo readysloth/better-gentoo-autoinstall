@@ -348,7 +348,43 @@ EOF
 
 
 cat << EOF >> /etc/privoxy/user.action
-{+https-inspection}
+{ \
++https-inspection \
++change-x-forwarded-for{block} \
++client-header-tagger{css-requests} \
++client-header-tagger{image-requests} \
++client-header-tagger{range-requests} \
++crunch-if-none-match \
++crunch-incoming-cookies \
++crunch-outgoing-cookies \
++deanimate-gifs{last} \
++fast-redirects{check-decoded-url} \
++filter{all-popups} \
++filter{banners-by-link} \
++filter{banners-by-size} \
++filter{blogspot} \
++filter{content-cookies} \
++filter{frameset-borders} \
++filter{google} \
++filter{html-annoyances} \
++filter{img-reorder} \
++filter{js-annoyances} \
++filter{jumping-windows} \
++filter{msn} \
++filter{no-ping} \
++filter{quicktime-kioskmode} \
++filter{refresh-tags} \
++filter{shockwave-flash} \
++filter{tiny-textforms} \
++filter{webbugs} \
++filter{yahoo} \
++hide-from-header{block} \
++hide-user-agent{Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36} \
++hide-if-modified-since{-60} \
++hide-referrer{https://www.google.com} \
++overwrite-last-modified{randomize} \
++set-image-blocker{blank} \
+}
 /
 EOF
 
