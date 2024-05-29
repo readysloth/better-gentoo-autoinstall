@@ -355,8 +355,6 @@ cat << EOF >> /etc/privoxy/user.action
 +client-header-tagger{image-requests} \
 +client-header-tagger{range-requests} \
 +crunch-if-none-match \
-+crunch-incoming-cookies \
-+crunch-outgoing-cookies \
 +deanimate-gifs{last} \
 +fast-redirects{check-decoded-url} \
 +filter{all-popups} \
