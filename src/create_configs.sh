@@ -322,11 +322,37 @@ EOF
 
 # privoxy
 
-mkdir -p /etc/privoxy
+mkdir -p /etc/privoxy/{CA,certs}
+pushd /etc/privoxy/CA
+    curl https://curl.se/ca/cacert.pem > trustedCAs.pem
+    openssl req \
+        -noenc \
+        -batch \
+        -new \
+        -x509 \
+        -extensions v3_ca \
+        -keyout cakey.pem \
+        -out cacert.crt \
+        -days 3650
+popd
+
 cat << EOF >> /etc/privoxy/config
-temporary-directory /tmp
+ca-directory /etc/privoxy/CA
+ca-cert-file cacert.crt
+ca-key-file cakey.pem
+certificate-directory /etc/privoxy/certs
+
+enable-proxy-authentication-forwarding 1
 handle-as-empty-doc-returns-ok 1
 EOF
+
+
+cat << EOF >> /etc/privoxy/user.action
+{+https-inspection}
+/
+EOF
+
+chown -R privoxy:privoxy /etc/privoxy
 
 # squid
 
