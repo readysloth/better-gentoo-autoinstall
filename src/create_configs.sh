@@ -390,6 +390,7 @@ chown -R privoxy:privoxy /etc/privoxy
 
 # squid
 
+/usr/libexec/squid/security_file_certgen -c -s /var/cache/squid/ssl_db -M 2048
 mkdir -p /etc/squid
 cat << EOF >> /etc/squid/squid.conf
 # Forward request to Privoxy
@@ -403,7 +404,12 @@ shutdown_lifetime 0 seconds
 httpd_suppress_version_string on
 forwarded_for off
 never_direct allow all
+
+sslproxy_cert_error allow localhost
+sslproxy_cert_error deny all
 EOF
+
+sed -i 's@^http_port.*@& ssl-bump cert=/etc/privoxy/CA/cacert.crt key=/etc/privoxy/CA/cakey.pem@' /etc/squid/squid.conf
 
 # Vim
 
