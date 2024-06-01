@@ -308,7 +308,9 @@ PACKAGES = [
                        'fast-redirects',
                        'whitelists',
                        'image-blocking',
-                       'extended-statistics']),
+                       'extended-statistics',
+                       'external-filters',
+                       'toggle']),
 
     # other packages
     Package('net-im/telegram-desktop',
