@@ -348,6 +348,7 @@ certificate-directory /etc/privoxy/certs
 enable-proxy-authentication-forwarding 1
 handle-as-empty-doc-returns-ok 1
 enable-remote-toggle 1
+receive-buffer-size 4194304
 EOF
 
 
