@@ -336,6 +336,9 @@ pushd /etc/privoxy/CA
         -days 3650
 popd
 
+
+sed -i 's/enable-remote-toggle/#&/' /etc/privoxy/config
+
 cat << EOF >> /etc/privoxy/config
 ca-directory /etc/privoxy/CA
 ca-cert-file cacert.crt
@@ -344,6 +347,7 @@ certificate-directory /etc/privoxy/certs
 
 enable-proxy-authentication-forwarding 1
 handle-as-empty-doc-returns-ok 1
+enable-remote-toggle 1
 EOF
 
 
