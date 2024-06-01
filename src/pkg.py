@@ -310,7 +310,8 @@ PACKAGES = [
                        'image-blocking',
                        'extended-statistics',
                        'external-filters',
-                       'toggle']),
+                       'toggle',
+                       'editor']),
 
     # other packages
     Package('net-im/telegram-desktop',
