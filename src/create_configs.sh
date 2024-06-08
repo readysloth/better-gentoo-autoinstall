@@ -416,6 +416,9 @@ EOF
 
 sed -i 's@^http_port.*@& ssl-bump cert=/etc/privoxy/CA/cacert.crt key=/etc/privoxy/CA/cakey.pem@' /etc/squid/squid.conf
 
+# adblock via hosts
+curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts >> /etc/hosts
+
 # Vim
 
 if [ "$minimal" != "True" ]
