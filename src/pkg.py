@@ -33,7 +33,7 @@ GLOBAL_USE_FLAGS = [
     'device-mapper', 'gtk', 'vulkan', 'sdl',
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
-    'tbb', 'lvm', 'zlib',
+    'tbb', 'lvm', 'zlib', 'bpf',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
 ]
