@@ -166,6 +166,7 @@ PACKAGES = [
     Package('dev-libs/light'),
     Package('dev-util/bcc'),  # useful ebpf scripts
     Package('dev-util/glslang'),  # for mesa build
+    Package('media-gfx/fbgrab'),
     Package('media-gfx/feh'),
     Package('media-gfx/flameshot'),
     Package('media-gfx/scrot'),
