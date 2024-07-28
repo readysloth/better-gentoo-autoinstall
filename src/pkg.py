@@ -74,6 +74,7 @@ PORTAGE_SETUP = [
         ShellCmd('echo "*/* $(cpuid2cpuflags)" >> /etc/portage/package.use/global'),
         None
     ),
+    ShellCmd('echo "*/* PYTHON_TARGETS: * -pypy3" >> /etc/portage/package.use/global'),
     ShellCmd('mkdir -p /etc/portage/env'),
     ShellCmd('mkdir -p /etc/portage/profile'),
     Package('app-portage/mirrorselect',
