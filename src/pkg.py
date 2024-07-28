@@ -142,9 +142,6 @@ BLOCKING_PACKAGES = MASKED + [
 ]
 
 PACKAGES = [
-    Package('dev-util/ccache',
-            keywords={'dev'}),
-
     # simple packages
     Package('app-admin/doas'),
     Package('app-admin/pass-otp'),
@@ -242,24 +239,42 @@ PACKAGES = [
     Package('x11-misc/polybar', use_flags='mpd network ipc'),
 
     # packages with keywords
-    Package('app-misc/binwalk', keywords={'dev'}),
-    Package('dev-build/cmake', keywords={'dev'}),
-    Package('dev-debug/ltrace', extra_use_flags='elfutils', keywords={'dev'}),
-    Package('dev-debug/strace', extra_use_flags='elfutils', keywords={'dev'}),
-    Package('dev-util/bear', keywords={'dev'}),
-    Package('dev-util/poke', use_flags='nbd', keywords={'dev'}),
-    Package('sys-libs/libfaketime', keywords={'dev'}),
-    Package('dev-lang/python',
-            use_flags='gdbm readline sqlite ncurses tk ssl',
-            keywords={'dev'}),
-    Package('dev-debug/gdb',
-            use_flags='cet python server source-highlight',
-            extra_use_flags='xml xxhash',
-            keywords={'dev'}),
+    OptionalCommands(
+        IfNotKeyword,
+        'no_dev_pkg',
+        [Package('app-forensics/aflplusplus'),
+         Package('app-forensics/radamsa'),
+         Package('app-forensics/zzuf'),
+         Package('app-misc/binwalk'),
+         Package('dev-build/cmake'),
+         Package('dev-debug/gef'),
+         Package('dev-debug/valgrind'),
+         Package('dev-util/bear'),
+         Package('dev-util/ccache'),
+         Package('dev-util/cppcheck'),
+         Package('dev-util/difftastic'),
+         Package('dev-util/radare2'),
+         Package('dev-util/rr'),
+         Package('media-gfx/graphviz'),
+         Package('sys-libs/libfaketime'),
+         Package('dev-debug/ltrace', extra_use_flags='elfutils'),
+         Package('dev-util/poke', use_flags='nbd'),
+         Package('dev-debug/gdb',
+                 use_flags='cet python server source-highlight',
+                 extra_use_flags='xml xxhash'),
+         Package('dev-dotnet/dotnet-sdk',
+                 binary_alternative='dev-dotnet/dotnet-sdk-bin'),
+         Package('dev-util/android-tools',
+                 extra_use_flags='python'),
+         ]),
+
+    # packages so useful, that they are needed outside development scope
+    Package('dev-debug/strace', extra_use_flags='elfutils'),
     Package('dev-vcs/git',
             use_flags='webdav safe-directory',
-            extra_use_flags='cgi gpg highlight',
-            keywords={'dev'}),
+            extra_use_flags='cgi gpg highlight'),
+    Package('dev-lang/python',
+            use_flags='gdbm readline sqlite ncurses tk ssl'),
 
     # packages wth big useflags
     Package('sys-kernel/linux-firmware',
@@ -321,25 +336,6 @@ PACKAGES = [
             use_flags='savedconfig',
             hooks=[st_patches]),
 
-
-    # optional, but useful packages
-
-    OptionalCommands(
-        IfNotKeyword,
-        'barebones',
-        [Package('app-forensics/radamsa', keywords={'dev'}),
-         Package('app-forensics/zzuf', keywords={'dev'}),
-         Package('dev-util/cppcheck', keywords={'dev'}),
-         Package('dev-util/difftastic', keywords={'dev'}),
-         Package('dev-debug/gef', keywords={'dev'}),
-         Package('dev-util/radare2', keywords={'dev'}),
-         Package('dev-util/rr', keywords={'dev'}),
-         Package('media-gfx/graphviz', keywords={'dev'}),
-         Package('app-misc/hivex', use_flags='perl'),
-         Package('media-gfx/openscad', use_flags='gui'),
-         ]),
-
-
     # optional packages
 
     IfKeyword('minimal',
@@ -347,6 +343,12 @@ PACKAGES = [
                       use_flags='minimal'),
               Package('app-editors/vim',
                       extra_use_flags='perl lua python terminal')),
+    OptionalCommands(
+        IfNotKeyword,
+        'barebones',
+        [Package('app-misc/hivex', use_flags='perl'),
+         Package('media-gfx/openscad', use_flags='gui'),
+         ]),
 
     OptionalCommands(
         IfNotKeyword,
@@ -356,8 +358,6 @@ PACKAGES = [
          Package('sys-devel/crossdev'),
          Package('app-emulation/virt-manager', use_flags='gui'),
          Package('media-gfx/gimp', use_flags='webp lua'),
-         Package('dev-debug/valgrind', keywords={'dev'}),
-         Package('app-forensics/aflplusplus', keywords={'dev'}),
          # uncomment if you are either brave or desperate enough
          # Package('media-gfx/freecad',
          #         use_flags=['addonmgr', 'designer', 'fem',
@@ -380,12 +380,6 @@ PACKAGES = [
                  use_flags='libssh parted qemu libvirtd'),
          Package('app-admin/conky',
                  use_flags='intel-backlight iostats portmon imlib rss'),
-         Package('dev-dotnet/dotnet-sdk',
-                 binary_alternative='dev-dotnet/dotnet-sdk-bin',
-                 keywords={'dev'}),
-         Package('dev-util/android-tools',
-                 extra_use_flags='python',
-                 keywords={'dev'}),
          ]),
 ]
 

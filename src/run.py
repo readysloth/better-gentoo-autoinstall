@@ -24,7 +24,10 @@ def parse_args(args):
                                 help='make installation as minimal, as possible')
     install_parser.add_argument('-B', '--barebones',
                                 action='store_true',
-                                help='make installation less than mimimal')
+                                help='make installation less than mimimal (implies -m)')
+    install_parser.add_argument('-P', '--no-dev-pkg',
+                                action='store_true',
+                                help='do not install dev packages (does not imply -B or -m)')
     install_parser.add_argument('-g', '--generic',
                                 action='store_true',
                                 help='tune for generic processor')
@@ -45,6 +48,8 @@ def main(args):
         os.environ['barebones'] = 'True'
     if args.generic:
         os.environ['generic'] = 'True'
+    if args.no_dev_pkg:
+        os.environ['no_dev_pkg'] = 'True'
     if args.no_disk_prepare:
         os.environ['no_disk_prepare'] = 'True'
 
