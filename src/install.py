@@ -213,9 +213,6 @@ def install(disk_node: str, pretend: bool = False):
         chroot_cmds.append(cmd_obj)
         conf_jobs_executed.append(cmd_obj)
 
-    for cmd in PRE_INSTALL:
-        chroot_cmds.append(cmd(pretend=pretend))
-
     all_packages = pkg.PACKAGES + pkg.TROUBLESOME_PACKAGES + pkg.BLOCKING_PACKAGES
     keywords.process_keywords(all_packages, pretend=pretend)
 
