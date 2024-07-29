@@ -188,6 +188,7 @@ PACKAGES = [
     Package('sys-apps/mlocate'),
     Package('sys-apps/net-tools'),
     Package('sys-apps/smartmontools'),
+    Package('sys-block/parted'),
     Package('sys-boot/os-prober'),
     Package('sys-fs/dosfstools'),
     Package('sys-fs/exfatprogs'),
