@@ -250,8 +250,6 @@ xset +fp \$(echo ${USER_HOME}/.fonts)
 xset fp rehash
 picom &
 clipmenud &
-conky
-warpd
 setxkbmap -option grp:alt_shift_toggle "us(dvorak),ru"
 ${USER_HOME}/.config/polybar/launch.sh --forest &
 exec bspwm
@@ -676,6 +674,9 @@ bspc config border_width 2
 bspc config borderless_monocle true
 bspc config gapless_monocle true
 bspc config focus_follows_pointer true
+
+conky
+warpd
 EOF
 
 # sxhkd
