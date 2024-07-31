@@ -34,6 +34,7 @@ GLOBAL_USE_FLAGS = [
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
     'tbb', 'lvm', 'zlib', 'bpf',
+    'truetype',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
 ]
@@ -379,7 +380,8 @@ PACKAGES = [
          Package('app-emulation/libvirt',
                  use_flags='libssh parted qemu libvirtd'),
          Package('app-admin/conky',
-                 use_flags='intel-backlight iostats portmon imlib rss'),
+                 use_flags=['intel-backlight', 'iostats', 'portmon',
+                            'imlib', 'rss', 'colour-name-map']),
          ]),
 ]
 
