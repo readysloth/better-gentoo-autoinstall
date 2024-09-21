@@ -214,6 +214,8 @@ PACKAGES = [
     Package('x11-misc/rofi'),
     Package('x11-misc/sxhkd'),
     Package('x11-misc/xclip'),
+    Package('x11-misc/xdg-user-dirs'),
+    Package('x11-misc/xdg-utils'),
     Package('x11-misc/xdo'),
     Package('x11-misc/xdotool'),
     Package('x11-misc/xfe'),
