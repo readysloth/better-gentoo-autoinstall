@@ -38,8 +38,20 @@ PRE_INSTALL = [
 
 USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
 
+EXT4_MOUNT_OPTIONS = ','.join(
+    ['defaults',
+     'noiversion',
+     'lazytime',
+     'noatime',
+     'inode_readahead_blks=64',
+     'commit=60',
+     'delalloc',
+     'auto_da_alloc']
+)
+
 POST_INSTALL = [
-    ShellCmd('genfstab -U / >> /etc/fstab'),
+    ShellCmd(f'genfstab -U / | sed "s/rw,relatime/{EXT4_MOUNT_OPTIONS}/" >> /etc/fstab'),
+
     ShellCmd('rc-update add ntp-client default'),
     ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
              name='user creation'),
