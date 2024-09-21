@@ -39,6 +39,7 @@ PRE_INSTALL = [
 USER_GROUPS = ['users', 'wheel', 'audio', 'usb', 'video']
 
 POST_INSTALL = [
+    ShellCmd('genfstab -U / >> /etc/fstab'),
     ShellCmd('rc-update add ntp-client default'),
     ShellCmd(f'useradd -m -G {",".join(USER_GROUPS)} -s /bin/bash user',
              name='user creation'),

@@ -195,6 +195,7 @@ PACKAGES = [
     Package('sys-fs/exfatprogs'),
     Package('sys-fs/fuse-exfat'),
     Package('sys-fs/fuse-zip'),
+    Package('sys-fs/genfstab'),
     Package('sys-fs/inotify-tools'),
     Package('sys-fs/lvm2'),
     Package('sys-fs/mtools'),
