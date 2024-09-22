@@ -4,10 +4,10 @@ USERNAME="$1"
 USER_HOME=$(eval echo ~"$USERNAME")
 
 WALLPAPERS="$(mktemp -d)"
-git clone --depth=1 https://github.com/dharmx/walls.git "$WALLPAPERS"
+git clone --depth=1 https://github.com/readysloth/wallpapers.git "$WALLPAPERS"
 mkdir "$WALLPAPERS/backgrounds"
 
-for wallpaper_type in wave cherry paper interior
+for wallpaper_type in images/*/*
 do
   cp "$WALLPAPERS/$wallpaper_type"/* "$WALLPAPERS/backgrounds"
 done
