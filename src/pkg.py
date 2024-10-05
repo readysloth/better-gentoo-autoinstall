@@ -255,6 +255,7 @@ PACKAGES = [
          Package('dev-debug/valgrind'),
          Package('dev-util/bear'),
          Package('dev-util/ccache'),
+         Package('dev-util/complexity'),
          Package('dev-util/cppcheck'),
          Package('dev-util/difftastic'),
          Package('dev-util/radare2'),
