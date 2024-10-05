@@ -177,21 +177,16 @@ cat << "EOF" > ${USER_HOME}/.scripts/random_conky_wallpaper.sh
 
 LAST_CHANGE_TIME="$(stat --format=%Y "$0")"
 CURRENT_TIME="$(date +%s)"
+WALLPAPER_COUNT="$(find ~/Images/backgrounds/ -type f | wc -l)"
+WALLPAPER_PERIOD=$((3 * 60 * 60))
+WALLPAPER_DURATION=$((WALLPAPER_PERIOD / WALLPAPER_COUNT))
 
-# To discard seconds
-CURRENT_TIME="$((CURRENT_TIME / (30 * 60)))"
-CURRENT_TIME="$((CURRENT_TIME * (30 * 60)))"
-
-WALLPAPER_DURATION="$((LAST_CHANGE_TIME - CURRENT_TIME))"
-
-if [ -n "$WALLPAPER_DURATION" ] && [ "$WALLPAPER_DURATION" -gt $(( 30 * 60 )) ]
+if [ -n "$WALLPAPER_DURATION" ] && [ $((LAST_CHANGE_TIME + WALLPAPER_DURATION)) -lt $CURRENT_TIME ]
 then
   touch "$0"
 fi
 
-WALLPAPER_COUNT="$(find ~/Images/backgrounds/ -type f | wc -l)"
-IMAGE_INDEX=$((CURRENT_TIME % WALLPAPER_COUNT + 1))
-
+IMAGE_INDEX=$((LAST_CHANGE_TIME % WALLPAPER_COUNT + 1))
 conky_wallpaper.sh "$(find ~/Images/backgrounds/ -type f | sort | sed -n "${IMAGE_INDEX}p")"
 EOF
 
