@@ -313,10 +313,10 @@ Section "InputClass"
 EndSection
 EOF
 
-# privoxy
+# squid
 
-mkdir -p /etc/privoxy/{CA,certs}
-pushd /etc/privoxy/CA
+mkdir -p /etc/squid/CA
+pushd /etc/squid/CA
     curl https://curl.se/ca/cacert.pem > trustedCAs.pem
     openssl req \
         -noenc \
@@ -324,90 +324,47 @@ pushd /etc/privoxy/CA
         -new \
         -x509 \
         -extensions v3_ca \
-        -keyout cakey.pem \
-        -out cacert.crt \
+        -keyout squid-cakey.pem \
+        -out squid-cacert.pem \
         -days 3650
+    openssl x509 \
+        -in squid-cacert.pem \
+        -outform DER \
+        -out squid-cacert.der
+    ln -s $PWD/squid-cacert.pem /usr/local/share/ca-certificates/squid.pem
 popd
 
+/usr/libexec/squid/security_file_certgen -c -s /var/cache/squid/ssl_db -M 4MB
 
-sed -i 's/enable-remote-toggle/#&/' /etc/privoxy/config
-
-cat << EOF >> /etc/privoxy/config
-ca-directory /etc/privoxy/CA
-ca-cert-file cacert.crt
-ca-key-file cakey.pem
-certificate-directory /etc/privoxy/certs
-
-enable-proxy-authentication-forwarding 1
-handle-as-empty-doc-returns-ok 1
-enable-remote-toggle 1
-receive-buffer-size 4194304
-EOF
-
-
-cat << EOF >> /etc/privoxy/user.action
-{ \
-+https-inspection \
-+change-x-forwarded-for{block} \
-+client-header-tagger{css-requests} \
-+client-header-tagger{image-requests} \
-+client-header-tagger{range-requests} \
-+crunch-if-none-match \
-+deanimate-gifs{last} \
-+fast-redirects{check-decoded-url} \
-+filter{all-popups} \
-+filter{banners-by-link} \
-+filter{banners-by-size} \
-+filter{blogspot} \
-+filter{content-cookies} \
-+filter{frameset-borders} \
-+filter{google} \
-+filter{html-annoyances} \
-+filter{img-reorder} \
-+filter{js-annoyances} \
-+filter{jumping-windows} \
-+filter{msn} \
-+filter{no-ping} \
-+filter{quicktime-kioskmode} \
-+filter{refresh-tags} \
-+filter{shockwave-flash} \
-+filter{tiny-textforms} \
-+filter{webbugs} \
-+filter{yahoo} \
-+hide-from-header{block} \
-+hide-user-agent{Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36} \
-+hide-if-modified-since{-60} \
-+hide-referrer{forge} \
-+overwrite-last-modified{randomize} \
-+set-image-blocker{blank} \
-}
-/
-EOF
-
-chown -R privoxy:privoxy /etc/privoxy
-
-# squid
-
-/usr/libexec/squid/security_file_certgen -c -s /var/cache/squid/ssl_db -M 2048
 mkdir -p /etc/squid
 cat << EOF >> /etc/squid/squid.conf
-# Forward request to Privoxy
-cache_peer 127.0.0.1 parent 8118 7 no-query default no-digest no-netdb-exchange
-# ACL for FTP
-acl ftp proto FTP
-# No FTP through Privoxy
-always_direct allow ftp
-# Immediate restart
-shutdown_lifetime 0 seconds
-httpd_suppress_version_string on
-forwarded_for off
-never_direct allow all
+
+visible_hostname localhost
+
+# HTTPS
+http_port 3128 \
+  intercept \
+  ssl-bump \
+  generate-host-certificates=on \
+  dynamic_cert_mem_cache_size=4MB \
+  cert=/etc/squid/CA/squid-cacert.pem \
+  key=/etc/squid/CA/squid-cakey.pem
 
 sslproxy_cert_error allow localhost
 sslproxy_cert_error deny all
+
+# Cache
+cache_dir ufs /var/cache/squid 512 16 256
+
+# Monitoring
+http_access allow localhost manager
+http_access deny manager
+
+http_access allow localhost
+http_access deny all
 EOF
 
-sed -i 's@^http_port.*@& ssl-bump cert=/etc/privoxy/CA/cacert.crt key=/etc/privoxy/CA/cakey.pem@' /etc/squid/squid.conf
+chown -R squid:squid /etc/squid
 
 # adblock via hosts
 curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts >> /etc/hosts
