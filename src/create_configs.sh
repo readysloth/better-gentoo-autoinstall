@@ -332,6 +332,7 @@ pushd /etc/squid/CA
         -outform DER \
         -out squid-cacert.der
     ln -s $PWD/squid-cacert.pem /usr/local/share/ca-certificates/squid.pem
+    update-ca-certificates
 popd
 
 /usr/libexec/squid/security_file_certgen -c -s /var/cache/squid/ssl_db -M 4MB
