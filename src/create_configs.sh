@@ -317,12 +317,14 @@ EOF
 
 mkdir -p /etc/squid/CA
 pushd /etc/squid/CA
-    curl https://curl.se/ca/cacert.pem > trustedCAs.pem
     openssl req \
         -noenc \
         -batch \
         -new \
         -x509 \
+        -nodes \
+        -sha256 \
+        -newkey rsa:2048 \
         -extensions v3_ca \
         -keyout squid-cakey.pem \
         -out squid-cacert.pem \
@@ -331,39 +333,51 @@ pushd /etc/squid/CA
         -in squid-cacert.pem \
         -outform DER \
         -out squid-cacert.der
-    ln -s $PWD/squid-cacert.pem /usr/local/share/ca-certificates/squid.pem
+    ln -s $PWD/squid-cacert.pem /usr/local/share/ca-certificates/squid.crt
     update-ca-certificates
 popd
 
 /usr/libexec/squid/security_file_certgen -c -s /var/cache/squid/ssl_db -M 4MB
+chown -R squid:squid /var/cache/squid
 
 mkdir -p /etc/squid
-cat << EOF >> /etc/squid/squid.conf
 
-visible_hostname localhost
+cat << EOF > /etc/squid/squid.conf.https_prep
+acl intermediate_fetching transaction_initiator certificate-fetching
+http_access allow intermediate_fetching
+EOF
+
+cat << EOF > /etc/squid/squid.conf.https
+http_access allow localhost
+visible_hostname squid_proxy
 
 # HTTPS
-http_port 3128 \
-  intercept \
+http_port 3129 \
+  tcpkeepalive=60,30,3 \
   ssl-bump \
   generate-host-certificates=on \
   dynamic_cert_mem_cache_size=4MB \
-  cert=/etc/squid/CA/squid-cacert.pem \
-  key=/etc/squid/CA/squid-cakey.pem
+  tls-cert=/etc/squid/CA/squid-cacert.pem \
+  tls-key=/etc/squid/CA/squid-cakey.pem
+ssl_bump server-first all
+ssl_bump stare all
+sslproxy_cert_error deny all
+
+sslcrtd_program \
+  /usr/libexec/squid/security_file_certgen -s /var/cache/squid/ssl_db -M 4MB
+sslcrtd_children 4
 
 sslproxy_cert_error allow localhost
 sslproxy_cert_error deny all
 
 # Cache
 cache_dir ufs /var/cache/squid 512 16 256
-
-# Monitoring
-http_access allow localhost manager
-http_access deny manager
-
-http_access allow localhost
-http_access deny all
 EOF
+
+cat \
+  /etc/squid/squid.conf.https_prep \
+  /etc/squid/squid.conf.default \
+  /etc/squid/squid.conf.https > /etc/squid/squid.conf
 
 chown -R squid:squid /etc/squid
 
