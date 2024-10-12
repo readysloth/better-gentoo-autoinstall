@@ -333,6 +333,7 @@ pushd /etc/squid/CA
         -in squid-cacert.pem \
         -outform DER \
         -out squid-cacert.der
+    mkdir -p /usr/local/share/ca-certificates
     ln -s $PWD/squid-cacert.pem /usr/local/share/ca-certificates/squid.crt
     update-ca-certificates
 popd
