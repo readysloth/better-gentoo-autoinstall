@@ -145,8 +145,10 @@ BLOCKING_PACKAGES = MASKED + [
 
 PACKAGES = [
     # simple packages
+    Package('app-admin/checksec'),
     Package('app-admin/doas'),
     Package('app-admin/pass-otp'),
+    Package('app-admin/ranpwd'),
     Package('app-arch/unrar'),
     Package('app-backup/fsarchiver'),
     Package('app-containers/docker'),
