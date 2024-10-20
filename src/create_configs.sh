@@ -253,10 +253,10 @@ EOF
 # picom
 
 cat << EOF > ${USER_HOME}/.config/picom.conf
+backend = "glx";
 shadow = true;
 no-dnd-shadow = true;
 no-dock-shadow = true;
-clear-shadow = true;
 shadow-radius = 7;
 shadow-offset-x = -7;
 shadow-offset-y = -7;
