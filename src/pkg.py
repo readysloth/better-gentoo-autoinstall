@@ -156,6 +156,7 @@ PACKAGES = [
     Package('app-containers/docker-compose'),
     Package('app-emulation/winetricks'),
     Package('app-eselect/eselect-repository'),
+    Package('app-misc/jo'),
     Package('app-misc/jq'),
     Package('app-misc/rlwrap'),
     Package('app-misc/tmux'),
