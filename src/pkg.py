@@ -34,7 +34,7 @@ GLOBAL_USE_FLAGS = [
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
     'tbb', 'lvm', 'zlib', 'bpf',
-    'truetype',
+    'truetype', 'icu',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
 ]
