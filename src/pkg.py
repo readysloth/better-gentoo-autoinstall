@@ -182,6 +182,7 @@ PACKAGES = [
     Package('net-fs/sshfs'),
     Package('net-misc/proxychains'),
     Package('net-proxy/mitmproxy'),
+    Package('net-vpn/networkmanager-openvpn'),
     Package('net-vpn/tor'),
     Package('net-wireless/iw'),
     Package('net-wireless/wireless-tools'),
