@@ -35,6 +35,7 @@ GLOBAL_USE_FLAGS = [
     'screencast', 'io-uring', 'xattr',
     'tbb', 'lvm', 'zlib', 'bpf',
     'truetype', 'icu',
+    'abi_x86_32', 'abi_x86_64',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
 ]
