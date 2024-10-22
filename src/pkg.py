@@ -34,7 +34,7 @@ GLOBAL_USE_FLAGS = [
     'osmesa', 'xinerama', 'v4l', 'opengl',
     'screencast', 'io-uring', 'xattr',
     'tbb', 'lvm', 'zlib', 'bpf',
-    'truetype', 'icu',
+    'truetype', 'icu', 'dist-kernel',
     'abi_x86_32', 'abi_x86_64',
     '-wayland', '-gnome', '-gnome-online-accounts',
     '-eds', '-systemd', '-llvm'
@@ -353,6 +353,12 @@ PACKAGES = [
                       use_flags='minimal'),
               Package('app-editors/vim',
                       extra_use_flags='perl lua python terminal')),
+
+    OptionalCommands(
+        IfKeyword,
+        'nvidia',
+        [Package('x11-drivers/nvidia-drivers')]),
+
     OptionalCommands(
         IfNotKeyword,
         'barebones',

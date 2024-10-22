@@ -35,6 +35,9 @@ def parse_args(args):
                                 action='store_true',
                                 help='do not prepare disk for install. '
                                      'Useful if you are installing OS to a file')
+    install_parser.add_argument('-N', '--nvidia',
+                                action='store_true',
+                                help='Install proprietary nvidia drivers')
     return parser.parse_args()
 
 
@@ -52,6 +55,8 @@ def main(args):
         os.environ['no_dev_pkg'] = 'True'
     if args.no_disk_prepare:
         os.environ['no_disk_prepare'] = 'True'
+    if args.nvidia:
+        os.environ['nvidia'] = 'True'
 
     import install
 
