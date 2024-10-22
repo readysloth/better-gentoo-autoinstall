@@ -874,8 +874,9 @@ for path_to_addon in \
   3838174/snaplinksplus-3.1.11.xpi
 do
   wget --directory-prefix="${USER_HOME}/useful-configs/firefox/plugins" \
-    https://addons.mozilla.org/firefox/downloads/file/$path_to_addon
+    https://addons.mozilla.org/firefox/downloads/file/$path_to_addon &
 done
+wait $(jobs -p)
 
 # adblock
 wget --directory-prefix="${USER_HOME}/useful-configs/firefox/plugins" \
