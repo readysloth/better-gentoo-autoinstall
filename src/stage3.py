@@ -85,7 +85,9 @@ def get_stage3_url(processor: str = 'amd64',
 
 def stage3(*args, pretend: bool = False, **kwargs):
     executed_procs = []
-    url = get_stage3_url(*args, **kwargs)
+    url = 'example.com'
+    if not pretend:
+        url = get_stage3_url(*args, **kwargs)
     STAGE3_DOWNLOAD.insert(url)
 
     for cmd in STAGE3:
