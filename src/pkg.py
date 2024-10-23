@@ -358,7 +358,7 @@ PACKAGES = [
     OptionalCommands(
         IfKeyword,
         'nvidia',
-        [Package('x11-drivers/nvidia-drivers')]),
+        [Package('x11-drivers/nvidia-drivers', use_flags='tools')]),
 
     OptionalCommands(
         IfNotKeyword,
