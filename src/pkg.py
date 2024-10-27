@@ -162,6 +162,7 @@ PACKAGES = [
     Package('app-misc/rlwrap'),
     Package('app-misc/tmux'),
     Package('app-misc/yq'),
+    Package('app-office/joplin-desktop'),
     Package('app-shells/dash'),
     Package('app-shells/fish'),
     Package('app-shells/fzf'),

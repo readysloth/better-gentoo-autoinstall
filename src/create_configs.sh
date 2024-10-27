@@ -871,7 +871,8 @@ for path_to_addon in \
   3059971/image_search_options-3.0.12.xpi \
   4175239/onetab-1.83.xpi \
   4261837/hover_zoom_plus-1.0.215.1.xpi \
-  3838174/snaplinksplus-3.1.11.xpi
+  3838174/snaplinksplus-3.1.11.xpi \
+  4094039/joplin_web_clipper-2.11.2.xpi
 do
   wget --directory-prefix="${USER_HOME}/useful-configs/firefox/plugins" \
     https://addons.mozilla.org/firefox/downloads/file/$path_to_addon &
