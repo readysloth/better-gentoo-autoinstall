@@ -160,6 +160,8 @@ PACKAGES = [
     Package('app-misc/jo'),
     Package('app-misc/jq'),
     Package('app-misc/rlwrap'),
+    Package('app-misc/task'),
+    Package('app-misc/timew'),
     Package('app-misc/tmux'),
     Package('app-misc/yq'),
     Package('app-office/joplin-desktop'),
