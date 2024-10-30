@@ -172,6 +172,8 @@ PACKAGES = [
     Package('dev-libs/light'),
     Package('dev-util/bcc'),  # useful ebpf scripts
     Package('dev-util/glslang'),  # for mesa build
+    Package('media-fonts/noto'),
+    Package('media-fonts/noto-emoji'),
     Package('media-gfx/fbgrab'),
     Package('media-gfx/feh'),
     Package('media-gfx/flameshot'),
