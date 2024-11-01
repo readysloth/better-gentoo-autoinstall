@@ -144,31 +144,7 @@ cat << "EOF" > ${USER_HOME}/.scripts/conky_wallpaper.sh
 
 IMAGE="$1"
 POSITION="360,50"
-IMAGE_WIDTH=$(identify -format "%w\n" "$IMAGE")
-IMAGE_HEIGHT=$(identify -format "%h\n" "$IMAGE")
-
-TARGET_WIDTH=1920
-TARGET_HEIGHT=1080
-SCALE_PERCENT=100
-WIDTH_PERCENT="$SCALE_PERCENT"
-HEIGHT_PERCENT="$SCALE_PERCENT"
-
-if [ $IMAGE_WIDTH -gt $TARGET_WIDTH ]
-then
-  WIDTH_PERCENT=$(printf "%0.f" "$(bc <<< "scale=3; ($TARGET_WIDTH / $IMAGE_WIDTH) * 100")")
-fi
-
-if [ $IMAGE_HEIGHT -gt $TARGET_HEIGHT ]
-then
-  HEIGHT_PERCENT=$(printf "%0.f" "$(bc <<< "scale=3; ($TARGET_HEIGHT / $IMAGE_HEIGHT) * 100")")
-fi
-
-SCALE_PERCENT=$((WIDTH_PERCENT > HEIGHT_PERCENT ? HEIGHT_PERCENT : WIDTH_PERCENT))
-
-IMAGE_WIDTH=$(printf "%0.f" "$(bc <<< "$IMAGE_WIDTH * $SCALE_PERCENT / 100")")
-IMAGE_HEIGHT=$(printf "%0.f" "$(bc <<< "$IMAGE_HEIGHT * $SCALE_PERCENT / 100")")
-
-echo "\${image $IMAGE -p $POSITION, -s ${IMAGE_WIDTH}x${IMAGE_HEIGHT}}"
+echo "\${image $IMAGE -p $POSITION}"
 EOF
 
 
