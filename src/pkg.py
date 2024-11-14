@@ -170,6 +170,7 @@ PACKAGES = [
     Package('app-shells/fzf'),
     Package('app-text/tree'),
     Package('dev-libs/light'),
+    Package('dev-python/pip'),
     Package('dev-util/bcc'),  # useful ebpf scripts
     Package('dev-util/glslang'),  # for mesa build
     Package('media-fonts/noto'),
