@@ -147,7 +147,6 @@ BLOCKING_PACKAGES = MASKED + [
 PACKAGES = [
     # simple packages
     Package('app-admin/checksec'),
-    Package('app-admin/doas'),
     Package('app-admin/pass-otp'),
     Package('app-admin/ranpwd'),
     Package('app-arch/unrar'),
@@ -234,6 +233,7 @@ PACKAGES = [
 
 
     # packages with small useflags
+    Package('app-admin/doas', use_flags='persist'),
     Package('app-admin/pass', use_flags='git'),
     Package('app-admin/sysklogd', use_flags='logger'),
     Package('app-arch/zip', use_flags='natspec'),

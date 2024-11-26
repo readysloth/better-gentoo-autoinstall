@@ -761,6 +761,7 @@ cat << EOF > /etc/doas.conf
 permit ${USERNAME} as root
 permit root as ${USERNAME}
 permit nopass root
+permit persist user
 EOF
 
 
