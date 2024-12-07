@@ -12,6 +12,7 @@ from cmd import (Cmd,
                  OptionalCommands)
 
 
+GB = 1024 * 1024 * 1024
 AVAILABLE_MEMORY = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
 
 
@@ -27,18 +28,11 @@ def ram_hog(pkg: Package):
         f.writelines([f'PORTAGE_TMPDIR="{notmpfs}"'])
 
     # less than 10 GiB
-    if AVAILABLE_MEMORY < 10 * 1024 * 1024 * 1024:
+    if AVAILABLE_MEMORY < 10 * GB:
         with open(Package.package_env_dir / Path('notmpfs.env'), 'a') as f:
             f.write(f'{pkg.package} notmpfs.conf\n')
 
-    # ~ 2GiB per compilation thread
-    two_gigs = 2 * 1024 * 1024 * 1024
-    free_ram_ratio = 0.4
-    jobs = (1 - free_ram_ratio) * AVAILABLE_MEMORY // two_gigs
-    if jobs > mp.cpu_count():
-        jobs = mp.cpu_count()
-    jobs = int(jobs)
-
+    jobs = AVAILABLE_MEMORY // GB // 2
     with open('/etc/portage/env/nproc.conf', 'w') as f:
         f.writelines([f'MAKEOPTS="-j{jobs}"'])
 
