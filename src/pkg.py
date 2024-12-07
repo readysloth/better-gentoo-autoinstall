@@ -239,6 +239,8 @@ PACKAGES = [
     Package('app-admin/sysklogd', use_flags='logger'),
     Package('app-arch/zip', use_flags='natspec'),
     Package('app-crypt/hashcat', use_flags='brain'),
+    # pulls in webkit-gtk
+    Package('app-office/gnucash', use_flags='ofx', keywords={'ram-hog'}),
     Package('media-libs/libpng', use_flags='apng'),
     Package('media-libs/libpulse', use_flags='glib'),
     Package('media-sound/alsa-utils', use_flags='bat ncurses'),
