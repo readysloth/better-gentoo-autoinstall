@@ -41,7 +41,7 @@ DISK_PART = [
 ]
 
 DISK_LVM_FIN = [
-    ShellCmd('pvcreate -ff',
+    ShellCmd('pvcreate -ff -y',
              critical=True,
              name='pvcreate',
              desc='physical volume init'),
