@@ -76,13 +76,14 @@ class Cmd:
                                              .replace('<', '')
         self.blocking = blocking
         self.critical = critical
-        self.env = {}
+        self.env = {**os.environ}
         if env:
             self.env = {**self.env, **env}
         self.keywords = keywords or set()
         self.ignore_change = ignore_change
         self.process = ft.partial(
             sp.Popen,
+            env=self.env,
             **kwargs
         )
 
@@ -112,11 +113,11 @@ class Cmd:
         logger = logging.getLogger()
         process_started_msg = str(self)
         self.counter += 1
-        self.env: dict = kwargs.get('env', self.env)
+        self.env.update(kwargs.get('env', {}))
 
         if pretend:
             logger.info(process_started_msg)
-            logger.debug(f'Launching {self.id}-{self.counter} {self.cmd} **{kwargs}')
+            logger.debug(f'Launching {self.id}-{self.counter} **{self.env} {self.cmd} **{kwargs}')
             return sp.CompletedProcess(self.cmd, returncode=0)
 
         self.before(self)
@@ -125,7 +126,7 @@ class Cmd:
         if 'stderr' not in kwargs:
             kwargs['stderr'] = open(f'{self.fs_friendly_name}-{self.id}-{self.counter}.stderr', 'wb')
 
-        logger.debug(f'Launching {self.id}-{self.counter} {self.cmd} **{kwargs}')
+        logger.debug(f'Launching in {Path.cwd()} {self.id}-{self.counter} **{self.env} {self.cmd} **{kwargs}')
         proc: sp.CompletedProcess = self.process(
             args=self.cmd,
             **kwargs)
