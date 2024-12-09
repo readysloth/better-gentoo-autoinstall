@@ -37,7 +37,7 @@ GLOBAL_USE_FLAGS = [
     'truetype', 'icu', 'dist-kernel',
     'abi_x86_32', 'abi_x86_64',
     '-wayland', '-gnome', '-gnome-online-accounts',
-    '-eds', '-systemd', '-llvm'
+    '-eds', '-systemd'
 ]
 
 MASKED = [
@@ -79,6 +79,15 @@ PORTAGE_SETUP = [
     ShellCmd('echo "*/* PYTHON_TARGETS: * -pypy3" >> /etc/portage/package.use/global'),
     ShellCmd('mkdir -p /etc/portage/env'),
     ShellCmd('mkdir -p /etc/portage/profile'),
+
+    Package('sys-apps/util-linux',
+            env={'USE': '-python'},
+            emerge_override='--oneshot',
+            critical=True),
+    Package('dev-lang/python',
+            use_flags='gdbm readline sqlite ncurses ssl -tk -bluetooth',
+            critical=True),
+
     Package('app-portage/mirrorselect',
             critical=True),
     ShellCmd('mirrorselect -s10 -4',
@@ -136,6 +145,9 @@ BLOCKING_PACKAGES = MASKED + [
             extra_use_flags='jit graphite',
             blocking=True,
             keywords={'ram-hog'}),
+    Package('sys-kernel/linux-firmware',
+            use_flags='compress-xz deduplicate',
+            blocking=True),
     Package('sys-kernel/gentoo-kernel',
             binary_alternative='sys-kernel/gentoo-kernel-bin',
             blocking=True),
@@ -187,6 +199,7 @@ PACKAGES = [
     Package('net-fs/cifs-utils'),
     Package('net-fs/samba'),
     Package('net-fs/sshfs'),
+    Package('net-libs/xdp-tools'),
     Package('net-misc/proxychains'),
     Package('net-proxy/mitmproxy'),
     Package('net-vpn/networkmanager-openvpn'),
@@ -281,12 +294,11 @@ PACKAGES = [
          Package('dev-debug/ltrace', extra_use_flags='elfutils'),
          Package('dev-util/poke', use_flags='nbd'),
          Package('dev-debug/gdb',
-                 use_flags='cet python server source-highlight',
+                 use_flags='cet server source-highlight',
                  extra_use_flags='xml xxhash'),
          Package('dev-dotnet/dotnet-sdk',
                  binary_alternative='dev-dotnet/dotnet-sdk-bin'),
-         Package('dev-util/android-tools',
-                 extra_use_flags='python'),
+         Package('dev-util/android-tools'),
          ]),
 
     # packages so useful, that they are needed outside development scope
@@ -298,8 +310,6 @@ PACKAGES = [
             use_flags='gdbm readline sqlite ncurses tk ssl'),
 
     # packages wth big useflags
-    Package('sys-kernel/linux-firmware',
-            use_flags='compress-xz deduplicate'),
     Package('net-misc/tigervnc',
             use_flags='server viewer',
             extra_use_flags='dri3 drm'),
@@ -362,7 +372,7 @@ PACKAGES = [
               Package('app-editors/vim',
                       use_flags='minimal'),
               Package('app-editors/vim',
-                      extra_use_flags='perl lua python terminal')),
+                      extra_use_flags='perl lua terminal')),
 
     OptionalCommands(
         IfKeyword,

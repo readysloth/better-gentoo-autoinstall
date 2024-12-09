@@ -238,7 +238,7 @@ class Package(ShellCmd):
         if self.mask:
             # masking can't be non-blocking
             kwargs['blocking'] = True
-            self.cmd = f'echo "{self.package}" >> {self.package_mask_dir}/{self.fs_friendly_name}'
+            self.cmd = f'echo "{self.package}" > {self.package_mask_dir}/{self.fs_friendly_name}'
 
         if prefetch and not (kwargs['critical'] or kwargs['blocking']):
             kwargs['hooks'] = [Package(self.package,
