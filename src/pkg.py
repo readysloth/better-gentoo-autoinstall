@@ -138,8 +138,11 @@ BLOCKING_PACKAGES = MASKED + [
 
     # essential packages
     Package('sys-devel/gcc',
-            use_flags='-* cet',
-            extra_use_flags='jit graphite pch',
+            use_flags=['cet', '-ada', '-d',
+                       '-debug', '-go', '-modula2',
+                       '-objc', '-objc++', '-objc-gc',
+                       '-rust'],
+            extra_use_flags='jit graphite',
             blocking=True,
             keywords={'ram-hog'}),
     Package('sys-kernel/linux-firmware',
