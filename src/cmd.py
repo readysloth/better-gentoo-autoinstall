@@ -76,7 +76,9 @@ class Cmd:
                                              .replace('<', '')
         self.blocking = blocking
         self.critical = critical
-        self.env = {**os.environ}
+        self.env = {}
+        if 'no_host_env' not in os.environ:
+            self.env = {**os.environ}
         if env:
             self.env = {**self.env, **env}
         self.keywords = keywords or set()

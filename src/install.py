@@ -78,6 +78,7 @@ POST_INSTALL = [
              name='lvm'),
 ] + [
     ShellCmd(f'rc-update add {s} default',
+             critical=False,
              name=f'service {s}',
              desc='added to default runlevel')
     for s in ['sysklogd', 'cronie', 'alsasound',

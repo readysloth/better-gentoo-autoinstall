@@ -38,6 +38,9 @@ def parse_args(args):
     install_parser.add_argument('-N', '--nvidia',
                                 action='store_true',
                                 help='Install proprietary nvidia drivers')
+    install_parser.add_argument('-E', '--no-host-env',
+                                action='store_true',
+                                help='do not use host environment')
     return parser.parse_args()
 
 
@@ -57,6 +60,8 @@ def main(args):
         os.environ['no_disk_prepare'] = 'True'
     if args.nvidia:
         os.environ['nvidia'] = 'True'
+    if args.no_host_env:
+        os.environ['no_host_env'] = 'True'
 
     import install
 
