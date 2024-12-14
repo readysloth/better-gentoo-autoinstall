@@ -83,7 +83,7 @@ POST_INSTALL = [
              desc='added to default runlevel')
     for s in ['sysklogd', 'cronie', 'alsasound',
               'docker', 'libvirtd', 'pulseaudio',
-              'dbus', 'NetworkManager']
+              'dbus', 'NetworkManager', 'display-manager']
 ]
 
 

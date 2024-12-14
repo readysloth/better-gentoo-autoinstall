@@ -230,6 +230,7 @@ PACKAGES = [
     Package('sys-process/procenv'),
     Package('virtual/ssh'),
     Package('x11-apps/setxkbmap'),
+    Package('x11-apps/xdm'),
     Package('x11-apps/xdpyinfo'),
     Package('x11-apps/xev'),
     Package('x11-apps/xkill'),

@@ -756,6 +756,46 @@ ${eval ${exec random_conky_wallpaper.sh}}
 EOF
 fi # conky
 
+# xdm
+sed -i.bak '/Xsetup_0/d' /etc/X11/xdm/xdm-config
+cat << EOF > /etc/X11/xdm/Xresources
+Xcursor.theme: whiteglass
+
+xlogin*login.translations: #override \
+        Ctrl<Key>R: abort-display()\n\
+        <Key>F1: set-session-argument(failsafe) finish-field()\n\
+        <Key>Delete: delete-character()\n\
+        <Key>Left: move-backward-character()\n\
+        <Key>Right: move-forward-character()\n\
+        <Key>Home: move-to-begining()\n\
+        <Key>End: move-to-end()\n\
+        Ctrl<Key>KP_Enter: set-session-argument(failsafe) finish-field()\n\
+        <Key>KP_Enter: set-session-argument() finish-field()\n\
+        Ctrl<Key>Return: set-session-argument(failsafe) finish-field()\n\
+        <Key>Return: set-session-argument() finish-field()
+
+xlogin*greeting: Login
+xlogin*namePrompt: Login:
+xlogin*fail: Failure
+
+xlogin*greetFace:       LiberationMono-24:bold
+xlogin*face:            LiberationMono-18:bold
+xlogin*promptFace:      LiberationMono-18:bold
+xlogin*failFace:        LiberationMono-18:bold
+
+xlogin*borderWidth: 3
+xlogin*frameWidth: 0
+xlogin*innerFramesWidth: 1
+xlogin*inpColor: white
+xlogin*promptColor: white
+xlogin*greetColor: blue
+xlogin*failColor: red
+xlogin*shdColor: black
+xlogin*hiColor: black
+xlogin*background: black
+EOF
+ln -s ${USER_HOME}/.xinitrc ${USER_HOME}/.xsession
+
 
 cat << EOF > /etc/doas.conf
 permit ${USERNAME} as root
