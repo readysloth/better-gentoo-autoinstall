@@ -201,6 +201,8 @@ PACKAGES = [
     Package('net-fs/sshfs'),
     Package('net-libs/xdp-tools'),
     Package('net-misc/proxychains'),
+    Package('net-print/cups'),
+    Package('net-print/cups-filters'),
     Package('net-proxy/mitmproxy'),
     Package('net-vpn/networkmanager-openvpn'),
     Package('net-vpn/tor'),
