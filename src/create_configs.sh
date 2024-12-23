@@ -23,109 +23,13 @@ cat << EOF > /etc/local.d/50-powertop.start
 powertop --auto-tune
 EOF
 
-
-if [ "$binary" != "True" ]
-then
-cat << EOF > /etc/local.d/60-vmtouch-firefox.start
-vmtouch -tf \
-/opt/firefox/ \
-/usr/lib/gcc/x86_64-pc-linux-gnu/13/libgcc_s.so* \
-/usr/lib/gcc/x86_64-pc-linux-gnu/13/libstdc++.so* \
-/usr/lib/locale/locale-archive \
-/usr/lib64/gconv* \
-/usr/lib64/gdk-pixbuf-2.0* \
-/usr/lib64/gio/modules/libdconfsettings.so \
-/usr/lib64/ld-linux-x86-64.so* \
-/usr/lib64/libEGL.so* \
-/usr/lib64/libEGL_mesa.so* \
-/usr/lib64/libGL.so* \
-/usr/lib64/libGLX.so* \
-/usr/lib64/libGLX_mesa.so* \
-/usr/lib64/libGLdispatch.so* \
-/usr/lib64/libX11-xcb.so* \
-/usr/lib64/libX11.so* \
-/usr/lib64/libXau.so* \
-/usr/lib64/libXcomposite.so* \
-/usr/lib64/libXcursor.so* \
-/usr/lib64/libXdamage.so* \
-/usr/lib64/libXdmcp.so* \
-/usr/lib64/libXext.so* \
-/usr/lib64/libXfixes.so* \
-/usr/lib64/libXi.so* \
-/usr/lib64/libXinerama.so* \
-/usr/lib64/libXrandr.so* \
-/usr/lib64/libXrender.so* \
-/usr/lib64/libXxf86vm.so* \
-/usr/lib64/libasound.so* \
-/usr/lib64/libasyncns.so* \
-/usr/lib64/libatk-1.0.so* \
-/usr/lib64/libatk-bridge-2.0.so* \
-/usr/lib64/libatspi.so* \
-/usr/lib64/libblkid.so* \
-/usr/lib64/libbz2.so* \
-/usr/lib64/libc.so* \
-/usr/lib64/libcairo-gobject.so* \
-/usr/lib64/libcairo.so* \
-/usr/lib64/libdbus-1.so* \
-/usr/lib64/libdl.so* \
-/usr/lib64/libdrm.so* \
-/usr/lib64/libdrm_intel.so* \
-/usr/lib64/libepoxy.so* \
-/usr/lib64/libexpat.so* \
-/usr/lib64/libffi.so* \
-/usr/lib64/libfontconfig.so* \
-/usr/lib64/libfreetype.so* \
-/usr/lib64/libfribidi.so* \
-/usr/lib64/libgbm.so* \
-/usr/lib64/libgdk-3.so* \
-/usr/lib64/libgdk_pixbuf-2.0.so* \
-/usr/lib64/libgio-2.0.so* \
-/usr/lib64/libglapi.so* \
-/usr/lib64/libglib-2.0.so* \
-/usr/lib64/libgmodule-2.0.so* \
-/usr/lib64/libgobject-2.0.so* \
-/usr/lib64/libgraphite2.so* \
-/usr/lib64/libgtk-3.so* \
-/usr/lib64/libharfbuzz.so* \
-/usr/lib64/libjpeg.so* \
-/usr/lib64/libm.so* \
-/usr/lib64/libmount.so* \
-/usr/lib64/libpango-1.0.so* \
-/usr/lib64/libpangocairo-1.0.so* \
-/usr/lib64/libpangoft2-1.0.so* \
-/usr/lib64/libpciaccess.so* \
-/usr/lib64/libpcre2-8.so* \
-/usr/lib64/libpixman-1.so* \
-/usr/lib64/libpng16.so* \
-/usr/lib64/libpthread.so* \
-/usr/lib64/libpulse.so* \
-/usr/lib64/libresolv.so* \
-/usr/lib64/librsvg-2.so* \
-/usr/lib64/librt.so* \
-/usr/lib64/libsensors.so* \
-/usr/lib64/libsndfile.so* \
-/usr/lib64/libwayland-client.so* \
-/usr/lib64/libwayland-cursor.so* \
-/usr/lib64/libwayland-egl.so* \
-/usr/lib64/libwayland-server.so* \
-/usr/lib64/libxcb-dri2.so* \
-/usr/lib64/libxcb-dri3.so* \
-/usr/lib64/libxcb-glx.so* \
-/usr/lib64/libxcb-present.so* \
-/usr/lib64/libxcb-randr.so* \
-/usr/lib64/libxcb-render.so* \
-/usr/lib64/libxcb-shm.so* \
-/usr/lib64/libxcb-sync.so* \
-/usr/lib64/libxcb-xfixes.so* \
-/usr/lib64/libxcb.so* \
-/usr/lib64/libxkbcommon.so* \
-/usr/lib64/libxml2.so* \
-/usr/lib64/libxshmfence.so* \
-/usr/lib64/libz.so* \
-/usr/lib64/libzstd.so* \
-/usr/lib64/pulseaudio
+cat << EOF > /etc/local.d/60-vmtouch-common.start
+vmtouch -tf /usr/lib/gcc /usr/lib/clang /usr/lib64 /usr/lib/locale /usr/share/fonts /usr/share/icons 
 EOF
-fi
+
+cat << EOF > /etc/local.d/60-vmtouch-firefox.start
+vmtouch -tf /opt/firefox/ ${USER_HOME}/.cache/mozilla ${USER_HOME}/.mozilla
+EOF
 
 chmod +x /etc/local.d/*.start /etc/local.d/*.stop
 
