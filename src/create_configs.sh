@@ -19,6 +19,11 @@ echo lz4 > /sys/module/zswap/parameters/compressor
 echo 1 > /sys/module/zswap/parameters/enabled
 EOF
 
+cat << EOF > /etc/local.d/50-powertop.start
+powertop --auto-tune
+EOF
+
+
 if [ "$binary" != "True" ]
 then
 cat << EOF > /etc/local.d/60-vmtouch-firefox.start

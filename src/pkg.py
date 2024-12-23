@@ -227,6 +227,7 @@ PACKAGES = [
     Package('sys-fs/mtools'),
     Package('sys-fs/ncdu-bin'),
     Package('sys-power/acpi'),
+    Package('sys-power/powertop'),
     Package('sys-process/cronie'),
     Package('sys-process/htop'),
     Package('sys-process/procenv'),
