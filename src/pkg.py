@@ -192,6 +192,7 @@ PACKAGES = [
     Package('media-gfx/flameshot'),
     Package('media-gfx/scrot'),
     Package('media-libs/libmpd'),
+    Package('media-sound/pavucontrol'),
     Package('media-video/peek'),
     Package('net-analyzer/tcpdump'),
     Package('net-dialup/picocom'),
