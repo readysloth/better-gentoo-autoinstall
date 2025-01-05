@@ -180,6 +180,7 @@ PACKAGES = [
     Package('app-shells/dash'),
     Package('app-shells/fish'),
     Package('app-shells/fzf'),
+    Package('app-text/diff-pdf'),
     Package('app-text/tree'),
     Package('dev-libs/light'),
     Package('dev-python/pip'),
